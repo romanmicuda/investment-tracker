@@ -20,7 +20,7 @@ class API {
             'Content-Type': 'application/json',
         };
         
-        if (this.token) {
+        if (this.token && this.token !== undefined && this.token !== 'undefined') {
             headers['Authorization'] = `Bearer ${this.token}`;
         }
         
