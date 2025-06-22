@@ -9,8 +9,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtUtil {
     // Generate a secure random secret key with: ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
-    // Or for a simple string: openssl rand -base64 32
-    private final String jwtSecret = "Ec4stO1cpznwVVGoFwh1jqAtJy1tKNpIDP6BKeg/VNo=";
+    // Or for a simple string: openssl rand -base64 64
+    private final String jwtSecret = "RLaLo2ollqbHBNbRnK11iN+1/xwpPlq6z7U9XFmaygHWfdiuoVgDPjdx12wQ95g0So2IAZtqxHfYIDNAs6XL/Q==";
     private final long jwtExpirationMs = 86400000; // 1 day
 
     public String generateToken(String username) {
