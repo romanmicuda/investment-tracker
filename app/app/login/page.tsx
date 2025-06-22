@@ -6,10 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { useRouter } from "next/router";
-import axios from "axios";
-import { redirect } from "next/navigation";
 import { api } from "@/components/utils/routes";
+import { useRouter } from "next/navigation";
 
 interface LoginProps {
   heading?: string;
@@ -47,6 +45,7 @@ const Login = ({
     });
     const [fetching, setFetching] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
     const handleLogin = async () => {
         try {
             setError(null); // Reset error state
@@ -54,7 +53,7 @@ const Login = ({
             const response = await api.post("/api/auth/login", formData);
             if (response.status === 200) {
                 api.setToken(response.data.token); // Assuming the token is returned in the response
-                redirect("/dashboard");
+                router.push("/dashboard");
             }
         } catch (error) {
             setError("Wrong username or password. Please try again.");

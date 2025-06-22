@@ -1,3 +1,5 @@
+import axios from "axios";
+
 class API {
     private baseUrl: string;
     private token: string | null = null;
@@ -15,8 +17,8 @@ class API {
         }
     }
 
-    private getHeaders(): HeadersInit {
-        const headers: HeadersInit = {
+    private getHeaders(): Record<string, string> {
+        const headers: Record<string, string> = {
             'Content-Type': 'application/json',
         };
         
@@ -37,11 +39,10 @@ class API {
     public async get(path: string, params: Record<string, string | number | boolean> = {}): Promise<any> {
         const url = new URL(this.buildUrl(path));
         Object.keys(params).forEach(key => url.searchParams.append(key, String(params[key])));
-        const response = await fetch(url.toString(), {
-            method: 'GET',
+        const response = await axios.get(url.toString(), {
             headers: this.getHeaders(),
         });
-        if (!response.ok) {
+        if (!response.status.toString().startsWith('2')) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response;
@@ -50,12 +51,10 @@ class API {
     public async post(path: string, body: object): Promise<any> {
         const url = new URL(this.buildUrl(path));
         console.log('POST URL:', url.toString());
-        const response = await fetch(url.toString(), {
-            method: 'POST',
+        const response = await axios.post(url.toString(), body, {
             headers: this.getHeaders(),
-            body: JSON.stringify(body),
         });
-        if (!response.ok) {
+        if (!response.status.toString().startsWith('2')) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response;
@@ -63,12 +62,10 @@ class API {
 
     public async put(path: string, body: object): Promise<any> {
         const url = new URL(this.buildUrl(path));
-        const response = await fetch(url.toString(), {
-            method: 'PUT',
+        const response = await axios.put(url.toString(), body, {
             headers: this.getHeaders(),
-            body: JSON.stringify(body),
         });
-        if (!response.ok) {
+        if (!response.status.toString().startsWith('2')) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response;
@@ -76,11 +73,10 @@ class API {
 
     public async delete(path: string): Promise<any> {
         const url = new URL(this.buildUrl(path));
-        const response = await fetch(url.toString(), {
-            method: 'DELETE',
+        const response = await axios.delete(url.toString(), {
             headers: this.getHeaders(),
         });
-        if (!response.ok) {
+        if (!response.status.toString().startsWith('2')) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response;

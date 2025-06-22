@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import axios from "axios";
-import { redirect } from "next/navigation";
 import { api } from "@/components/utils/routes";
+import { useRouter } from "next/navigation";
 
 interface SignupProps {
   heading?: string;
@@ -46,13 +45,14 @@ const Signup = ({
     });
     const [error, setError] = useState<string | null>(null);
     const [fetching, setFetching] = useState(false);
+    const router = useRouter();
     const handleSignup = async () => {
         try {
             setError(null); // Reset error state
             setFetching(true);
         const response = await api.post("/api/auth/register", formData);
         if (response.status === 200) {
-            redirect("/login");
+            router.push("/login");
         }
         } catch (error) {
             setError("Something went wrong. Please try again.");

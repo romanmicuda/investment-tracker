@@ -1,11 +1,13 @@
 'use client';
 
 import React from "react";
+import { useRouter } from "next/navigation";
 
 const DashboardPage = () => {
+    const router = useRouter();
     const handleLogout = () => {
-        // Add your logout logic here
-        console.log("Logged out");
+        localStorage.removeItem("authToken");
+        router.push("/login");
     };
 
     return (
