@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-interface Login2Props {
+interface LoginProps {
   heading?: string;
   subheading?: string;
   logo: {
@@ -32,7 +32,7 @@ const Login = ({
   buttonText = "Login",
   signupText = "Don't have an account?",
   signupUrl = "/signup",
-}: Login2Props) => {
+}: LoginProps) => {
   return (
     <section className="h-screen bg-muted">
       <div className="flex h-full items-center justify-center">
