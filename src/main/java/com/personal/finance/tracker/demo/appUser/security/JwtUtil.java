@@ -3,14 +3,16 @@ package com.personal.finance.tracker.demo.appUser.security;
 
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 import java.util.Date;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtUtil {
     // Generate a secure random secret key with: ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
-    // Or for a simple string: openssl rand -base64 32
-    private final String jwtSecret = "Ec4stO1cpznwVVGoFwh1jqAtJy1tKNpIDP6BKeg/VNo=";
+    // Or for a simple string: openssl rand -base64 64
+    @Value("${jwt.secret}")
+    private String jwtSecret;
     private final long jwtExpirationMs = 86400000; // 1 day
 
     public String generateToken(String username) {
