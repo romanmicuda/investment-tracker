@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import com.personal.finance.tracker.demo.appUser.model.AppUser;
 import com.personal.finance.tracker.demo.appUser.model.Token;
 import com.personal.finance.tracker.demo.appUser.security.JwtUtil;
+import com.personal.finance.tracker.demo.exception.IllegalOperationException;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.appUser.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,10 @@ public class AuthServiceIml implements AuthService {
     }
 
     @Override
-    public AppUser register(String username, String email, String password) {
+    public AppUser register(String username, String email, String password) throws IllegalOperationException {
+        if (appUserRepository.findByUsername(username).isPresent()) {
+            throw new IllegalOperationException("Username already exists");
+        }
         AppUser user = new AppUser();
         user.setUsername(username);
         user.setEmail(email);

@@ -5,6 +5,7 @@ import com.personal.finance.tracker.demo.appUser.model.LoginRequest;
 import com.personal.finance.tracker.demo.appUser.model.RegisterRequest;
 import com.personal.finance.tracker.demo.appUser.model.Token;
 import com.personal.finance.tracker.demo.appUser.service.AuthService;
+import com.personal.finance.tracker.demo.exception.IllegalOperationException;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AppUser> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<AppUser> register(@RequestBody RegisterRequest registerRequest) throws IllegalOperationException {
         AppUser newUser = authService.register(registerRequest.getUsername(), registerRequest.getEmail(), registerRequest.getPassword());
         return ResponseEntity.ok(newUser);
     }
