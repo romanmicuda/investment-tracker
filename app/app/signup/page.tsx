@@ -31,7 +31,7 @@ const Signup = ({
   googleText = "Sign up with Google",
   signupText = "Create an account",
   loginText = "Already have an account?",
-  loginUrl = "#",
+  loginUrl = "/login",
 }: SignupProps) => {
   return (
     <section className="h-screen bg-muted">

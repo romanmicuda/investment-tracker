@@ -31,7 +31,7 @@ const Login = ({
   googleText = "Sign up with Google",
   buttonText = "Login",
   signupText = "Don't have an account?",
-  signupUrl = "https://shadcnblocks.com",
+  signupUrl = "/signup",
 }: Login2Props) => {
   return (
     <section className="h-screen bg-muted">
@@ -87,7 +87,6 @@ const Login = ({
             <p>{signupText}</p>
             <a
               href={signupUrl}
-              target="_blank"
               className="font-medium text-primary hover:underline"
             >
               Sign up
