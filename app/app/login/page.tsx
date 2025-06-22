@@ -1,8 +1,15 @@
+"use client";
+
 import { FcGoogle } from "react-icons/fc";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { useRouter } from "next/router";
+import axios from "axios";
+import { redirect } from "next/navigation";
+import { api } from "@/components/utils/routes";
 
 interface LoginProps {
   heading?: string;
@@ -33,6 +40,29 @@ const Login = ({
   signupText = "Don't have an account?",
   signupUrl = "/signup",
 }: LoginProps) => {
+
+    const [formData, setFormData] = useState({
+        username: "",
+        password: "",
+    });
+    const [fetching, setFetching] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const handleLogin = async () => {
+        try {
+            setError(null); // Reset error state
+            setFetching(true);
+            const response = await api.post("/api/auth/login", formData);
+            if (response.status === 200) {
+                api.setToken(response.data.token); // Assuming the token is returned in the response
+                redirect("/dashboard");
+            }
+        } catch (error) {
+            setError("Wrong username or password. Please try again.");
+        }finally {
+            setFetching(false);
+        }
+    };
+
   return (
     <section className="h-screen bg-muted">
       <div className="flex h-full items-center justify-center">
@@ -55,9 +85,12 @@ const Login = ({
           <div className="flex w-full flex-col gap-8 rounded-md border border-muted bg-white px-6 py-12 shadow-md">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
-                <Label>Email</Label>
+                <Label>Username</Label>
                 <Input
                   type="username"
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
                   placeholder="Enter your username"
                   required
                   className="bg-white"
@@ -67,13 +100,16 @@ const Login = ({
                 <Label>Password</Label>
                 <Input
                   type="password"
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   placeholder="Enter your password"
                   required
                   className="bg-white"
                 />
               </div>
               <div className="flex flex-col gap-4">
-                <Button type="submit" className="mt-2 w-full">
+                <Button type="submit" className="mt-2 w-full" onClick={() => handleLogin()} disabled={fetching}>
                   {buttonText}
                 </Button>
                 {/* <Button variant="outline" className="w-full">
@@ -81,6 +117,9 @@ const Login = ({
                   {googleText}
                 </Button> */}
               </div>
+            {error && (
+                    <div className="text-red-500 text-sm text-center mb-2">{error}</div>
+                )}
             </div>
           </div>
           <div className="flex justify-center gap-1 text-sm text-muted-foreground">

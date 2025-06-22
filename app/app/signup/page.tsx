@@ -1,8 +1,14 @@
+'use client';
+
 import { FcGoogle } from "react-icons/fc";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import axios from "axios";
+import { redirect } from "next/navigation";
+import { api } from "@/components/utils/routes";
 
 interface SignupProps {
   heading?: string;
@@ -33,7 +39,33 @@ const Signup = ({
   loginText = "Already have an account?",
   loginUrl = "/login",
 }: SignupProps) => {
+    const [formData, setFormData] = useState({
+        email: "",
+        username: "",
+        password: "",
+    });
+    const [error, setError] = useState<string | null>(null);
+    const [fetching, setFetching] = useState(false);
+    const handleSignup = async () => {
+        try {
+            setError(null); // Reset error state
+            setFetching(true);
+        const response = await api.post("/api/auth/register", formData);
+        if (response.status === 200) {
+            redirect("/login");
+        }
+        } catch (error) {
+            setError("Something went wrong. Please try again.");
+        }finally {
+            setFetching(false);
+        }
+    };
+
   return (
+
+
+
+
     <section className="h-screen bg-muted">
       <div className="flex h-full items-center justify-center">
         <div className="flex w-full max-w-sm flex-col items-center gap-y-8">
@@ -57,6 +89,7 @@ const Signup = ({
               <div className="flex flex-col gap-2">
                 <Label>Email</Label>
                 <Input
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   type="email"
                   placeholder="Enter your email"
                   required
@@ -64,23 +97,39 @@ const Signup = ({
                 />
               </div>
               <div className="flex flex-col gap-2">
+                <Label>Username</Label>
+                <Input
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  type="text"
+                  placeholder="Enter your username"
+                  required
+                  className="bg-white"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
                 <Label>Password</Label>
                 <Input
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   type="password"
                   placeholder="Enter your password"
                   required
                   className="bg-white"
                 />
               </div>
+
               <div className="flex flex-col gap-4">
-                <Button type="submit" className="mt-2 w-full">
+                <Button type="submit" className="mt-2 w-full" onClick={() => handleSignup()} disabled={fetching}>
                   {signupText}
                 </Button>
+                
                 {/* <Button variant="outline" className="w-full">
                   <FcGoogle className="mr-2 size-5" />
                   {googleText}
                 </Button> */}
               </div>
+            {error && (
+                    <div className="text-red-500 text-sm text-center mb-2">{error}</div>
+                )}
             </div>
           </div>
           <div className="flex justify-center gap-1 text-sm text-muted-foreground">
