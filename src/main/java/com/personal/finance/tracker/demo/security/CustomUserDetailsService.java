@@ -1,7 +1,8 @@
-package com.personal.finance.tracker.demo.appUser.security;
+package com.personal.finance.tracker.demo.security;
 
-import com.personal.finance.tracker.demo.appUser.model.AppUser;
-import com.personal.finance.tracker.demo.appUser.repository.AppUserRepository;
+import com.personal.finance.tracker.demo.appUser.data.AppUser;
+import com.personal.finance.tracker.demo.appUser.data.AppUserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

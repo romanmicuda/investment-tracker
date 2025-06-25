@@ -1,15 +1,16 @@
-package com.personal.finance.tracker.demo.appUser.service;
+package com.personal.finance.tracker.demo.appUser.logic;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
-import com.personal.finance.tracker.demo.appUser.model.AppUser;
-import com.personal.finance.tracker.demo.appUser.model.Token;
-import com.personal.finance.tracker.demo.appUser.security.JwtUtil;
+import com.personal.finance.tracker.demo.appUser.data.AppUser;
+import com.personal.finance.tracker.demo.appUser.data.AppUserRepository;
+import com.personal.finance.tracker.demo.appUser.data.Token;
 import com.personal.finance.tracker.demo.exception.IllegalOperationException;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
-import com.personal.finance.tracker.demo.appUser.repository.AppUserRepository;
+import com.personal.finance.tracker.demo.security.JwtUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -52,7 +53,7 @@ public class AuthServiceIml implements AuthService {
                 )
         );
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new NotFoundException();
+            throw new NotFoundException("Invalid username or password");
         }
         Token token = new Token(jwtUtil.generateToken(username));
         return token; 

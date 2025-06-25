@@ -1,4 +1,4 @@
-package com.personal.finance.tracker.demo.appUser.security;
+package com.personal.finance.tracker.demo.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

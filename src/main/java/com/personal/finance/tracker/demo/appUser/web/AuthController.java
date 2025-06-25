@@ -1,10 +1,10 @@
-package com.personal.finance.tracker.demo.appUser.controller;
+package com.personal.finance.tracker.demo.appUser.web;
 
-import com.personal.finance.tracker.demo.appUser.model.AppUser;
-import com.personal.finance.tracker.demo.appUser.model.LoginRequest;
-import com.personal.finance.tracker.demo.appUser.model.RegisterRequest;
-import com.personal.finance.tracker.demo.appUser.model.Token;
-import com.personal.finance.tracker.demo.appUser.service.AuthService;
+import com.personal.finance.tracker.demo.appUser.data.AppUser;
+import com.personal.finance.tracker.demo.appUser.data.Token;
+import com.personal.finance.tracker.demo.appUser.logic.AuthService;
+import com.personal.finance.tracker.demo.appUser.web.bodies.LoginRequest;
+import com.personal.finance.tracker.demo.appUser.web.bodies.RegisterRequest;
 import com.personal.finance.tracker.demo.exception.IllegalOperationException;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 

@@ -1,6 +1,8 @@
 package com.personal.finance.tracker.demo.category.model;
 
-import com.personal.finance.tracker.demo.appUser.model.AppUser;
+import java.util.UUID;
+
+import com.personal.finance.tracker.demo.appUser.data.AppUser;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,8 +13,8 @@ import lombok.*;
 public class Category {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     private String name;
 

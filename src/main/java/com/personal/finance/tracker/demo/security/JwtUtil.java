@@ -1,5 +1,5 @@
 // Utility class for generating and validating JWT tokens
-package com.personal.finance.tracker.demo.appUser.security;
+package com.personal.finance.tracker.demo.security;
 
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;

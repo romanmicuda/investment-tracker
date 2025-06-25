@@ -1,13 +1,14 @@
-package com.personal.finance.tracker.demo.appUser.model;
+package com.personal.finance.tracker.demo.appUser.data;
 
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import com.personal.finance.tracker.demo.category.model.Category;
 import com.personal.finance.tracker.demo.investment.model.Investment;
-import com.personal.finance.tracker.demo.transaction.model.Transaction;
+import com.personal.finance.tracker.demo.transaction.data.Transaction;
 
 @Entity
 @Getter @Setter
@@ -15,9 +16,9 @@ import com.personal.finance.tracker.demo.transaction.model.Transaction;
 public class AppUser {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+    
     @Column(nullable = false, unique = true)
     private String username;
 

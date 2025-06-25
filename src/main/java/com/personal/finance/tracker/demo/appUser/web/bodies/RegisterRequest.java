@@ -1,4 +1,4 @@
-package com.personal.finance.tracker.demo.appUser.model;
+package com.personal.finance.tracker.demo.appUser.web.bodies;
 
 import lombok.Data;
 

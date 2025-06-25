@@ -1,10 +1,11 @@
-package com.personal.finance.tracker.demo.transaction.model;
+package com.personal.finance.tracker.demo.transaction.data;
 
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.UUID;
 
-import com.personal.finance.tracker.demo.appUser.model.AppUser;
+import com.personal.finance.tracker.demo.appUser.data.AppUser;
 import com.personal.finance.tracker.demo.category.model.Category;
 import com.personal.finance.tracker.demo.transactionType.model.TransactionType;
 
@@ -14,8 +15,8 @@ import com.personal.finance.tracker.demo.transactionType.model.TransactionType;
 public class Transaction {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     private double amount;
 
