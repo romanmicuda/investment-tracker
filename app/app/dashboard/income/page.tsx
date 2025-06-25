@@ -5,6 +5,7 @@ import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader,
 import React from "react"
 import { Input } from "@/components/ui/input"
 import { useForm, SubmitHandler } from "react-hook-form"
+import { api } from "@/components/utils/routes"
 
 export default function page() {
     const [showAddIncomeForm, setShowAddIncomeForm] = React.useState(false);
@@ -55,8 +56,17 @@ interface IFormInput {
 
 const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
     const { register, handleSubmit } = useForm<IFormInput>();
-    const onSubmit: SubmitHandler<IFormInput> = (data) => {
-        console.log(data);
+    const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+        try {
+            const response = await api.post("api/transaction", data);
+            if (response.status === 200) {
+
+                alert("Income added successfully!");
+                closeForm();
+            }
+        } catch (error) {
+            alert("Failed to add income. Please try again.");
+        }
     };
 
     return (
