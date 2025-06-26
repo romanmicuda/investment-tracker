@@ -2,10 +2,14 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import React from "react"
-import { Input } from "@/components/ui/input"
-import { useForm, SubmitHandler } from "react-hook-form"
+import React, { useState } from "react"
 import { api } from "@/components/utils/routes"
+import ComboboxWithSearchAndButton from "@/components/ComboboxWithSearchAndButton"
+import { TypeTransaction } from "@/components/utils/data"
+import Combobox from "@/components/Combobox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
 
 export default function page() {
     const [showAddIncomeForm, setShowAddIncomeForm] = React.useState(false);
@@ -55,8 +59,18 @@ interface IFormInput {
 
 
 const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
-    const { register, handleSubmit } = useForm<IFormInput>();
-    const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    const [categories, setCategories] = useState<string[]>(["Salary", "Investment", "Freelance"]);
+    const [formData, setFormData] = useState<IFormInput>({
+        amount: 0,
+        date: '',
+        type: '',
+        category: '',
+        description: ''
+    });
+    const [selectedCategory, setSelectedCategory] = useState<string>("");
+    const [selectedTransactionType, setSelectedTransactionType] = useState<string>("");
+
+    const onSubmit = async (data: IFormInput): Promise<void> => {
         try {
             const response = await api.post("api/transaction", data);
             if (response.status === 200) {
@@ -75,24 +89,51 @@ const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
                 <CardTitle>Add Income</CardTitle>
                 <CardDescription>Fill in the details below to add a new income entry.</CardDescription>
             </CardHeader>
-            <form onSubmit={handleSubmit(onSubmit)} className="p-4">
+            <form className="p-4" onSubmit={(e) => {
+                e.preventDefault();
+                onSubmit(formData);
+            }}>
                 <div className="flex flex-col gap-4">
+                    <Label>Amount</Label>
                     <Input
                         type="number"
                         step="any"
                         placeholder="Amount"
-                        {...register("amount", { required: true, valueAsNumber: true })}
+                        value={formData.amount}
+                        className="w-1/2"
+                        onChange={(e) => setFormData((prev) => ({ ...prev, amount: parseFloat(e.target.value) }))}
                     />
-                    <Input type="date" placeholder="Date" {...register("date", { required: true })} />
-                    <Input type="text" placeholder="Type" {...register("type", { required: true })} />
-                    <Input type="text" placeholder="Category" {...register("category", { required: true })} />
-                    <Input type="text" placeholder="Description" {...register("description")} />
+                    <Label>Date</Label>
+                    <Input type="date" placeholder="Date"
+                        value={formData.date}
+                        className="w-1/2"
+                        onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
+                    />
+                    <Combobox
+                        options={TypeTransaction}
+                        value={formData.type}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, type: value }))}
+                        placeholder='Select transaction type...'
+                        label='Transaction Type'
+                    />
+                    <ComboboxWithSearchAndButton
+                        options={categories.map(category => ({ value: category, label: category }))}
+                        value={formData.category}
+                        setValue={(value) => {
+                            setFormData((prev) => ({ ...prev, category: value }));
+                        }}
+                        label='Category'
+                        onAdd={() => alert('Add new category')}
+                    />
+                                       <Label>Description</Label>
+                    <Input type="text" placeholder="Description"
+                        value={formData.description}
+                        className="w-1/2"
+                        onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))} />
                 </div>
                 <div className="flex justify-end mt-4">
                     <Button type="button" onClick={() => closeForm()}>Cancel</Button>
                     <span className="mx-2"></span>
-
-
                     <Button type="submit">Submit</Button>
                 </div>
             </form>
@@ -104,7 +145,7 @@ const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
 const RemoteHookInput = ({
     placeholder = "Remote Hook Input",
     apiUrl = "",
-    onChange = () => {},
+    onChange = () => { },
     value = "",
     className = "",
     ...props
@@ -114,10 +155,9 @@ const RemoteHookInput = ({
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
     value?: string,
     className?: string,
-}) => { 
+}) => {
 
     return (
         <Input type="text" placeholder={placeholder} onChange={onChange} value={value} className={className} {...props} />
     );
 }
-

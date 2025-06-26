@@ -1,0 +1,1 @@
+export const TypeTransaction = [{label: 'Income', value: 'income'}, {label: 'Expense', value: 'expense'}];
