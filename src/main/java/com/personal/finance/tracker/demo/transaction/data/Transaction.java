@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import com.personal.finance.tracker.demo.appUser.data.AppUser;
-import com.personal.finance.tracker.demo.category.model.Category;
+import com.personal.finance.tracker.demo.category.data.Category;
 import com.personal.finance.tracker.demo.transactionType.model.TransactionType;
 
 @Entity

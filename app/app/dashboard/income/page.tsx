@@ -59,7 +59,6 @@ interface IFormInput {
 
 
 const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
-    const [categories, setCategories] = useState<string[]>(["Salary", "Investment", "Freelance"]);
     const [formData, setFormData] = useState<IFormInput>({
         amount: 0,
         date: '',
@@ -67,8 +66,6 @@ const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
         category: '',
         description: ''
     });
-    const [selectedCategory, setSelectedCategory] = useState<string>("");
-    const [selectedTransactionType, setSelectedTransactionType] = useState<string>("");
 
     const onSubmit = async (data: IFormInput): Promise<void> => {
         try {
@@ -81,7 +78,7 @@ const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
         } catch (error) {
             alert("Failed to add income. Please try again.");
         }
-    };
+    };  
 
     return (
         <Card className="w-5xl m-5 mt-10">
@@ -109,21 +106,20 @@ const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
                         className="w-1/2"
                         onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
                     />
-                    <Combobox
+                    <ComboboxWithSearchAndButton
                         options={TypeTransaction}
                         value={formData.type}
-                        onValueChange={(value) => setFormData((prev) => ({ ...prev, type: value }))}
-                        placeholder='Select transaction type...'
+                        setValue={(value) => setFormData((prev) => ({ ...prev, type: value }))}
                         label='Transaction Type'
                     />
                     <ComboboxWithSearchAndButton
-                        options={categories.map(category => ({ value: category, label: category }))}
+                        options={[]}
+                        url={"category/all"}
                         value={formData.category}
                         setValue={(value) => {
                             setFormData((prev) => ({ ...prev, category: value }));
                         }}
                         label='Category'
-                        onAdd={() => alert('Add new category')}
                     />
                                        <Label>Description</Label>
                     <Input type="text" placeholder="Description"

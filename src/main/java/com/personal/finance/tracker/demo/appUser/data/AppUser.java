@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import com.personal.finance.tracker.demo.category.model.Category;
+import com.personal.finance.tracker.demo.category.data.Category;
 import com.personal.finance.tracker.demo.investment.model.Investment;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 

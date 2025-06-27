@@ -1,4 +1,4 @@
-package com.personal.finance.tracker.demo.category.model;
+package com.personal.finance.tracker.demo.category.data;
 
 import java.util.UUID;
 

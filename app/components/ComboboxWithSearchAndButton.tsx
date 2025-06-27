@@ -26,7 +26,7 @@ interface ComboboxProps {
   setValue: (value: string) => void
   label: string
   onAdd?: () => void
-  url?: string // Optional URL for fetching options
+  url?: string
 }
 
 const ComboboxWithSearchAndButton = ({ options, value, setValue, label, onAdd, url }: ComboboxProps) => {
