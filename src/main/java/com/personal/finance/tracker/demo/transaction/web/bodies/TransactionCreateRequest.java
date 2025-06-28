@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import lombok.Data;
 
 @Data
-public class TransactionRequest {
+public class TransactionCreateRequest {
     private double amount;
 
     private String type;

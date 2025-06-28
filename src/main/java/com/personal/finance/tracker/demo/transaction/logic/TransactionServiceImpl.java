@@ -13,7 +13,7 @@ import com.personal.finance.tracker.demo.category.logic.CategoryService;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 import com.personal.finance.tracker.demo.transaction.data.TransactionRepository;
-import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionRequest;
+import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionCreateRequest;
 import com.personal.finance.tracker.demo.transactionType.model.TransactionType;
 
 @Service
@@ -28,7 +28,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction createTransaction(TransactionRequest transaction, AppUser appUser) throws NotFoundException {
+    public Transaction createTransaction(TransactionCreateRequest transaction, AppUser appUser) throws NotFoundException {
         Transaction newTransaction = new Transaction();
         newTransaction.setAmount(transaction.getAmount());
         newTransaction.setType(TransactionType.valueOf(transaction.getType().toUpperCase()));
