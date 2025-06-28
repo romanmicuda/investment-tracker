@@ -9,6 +9,25 @@ import { TypeTransaction } from "@/components/utils/data"
 import Combobox from "@/components/Combobox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import TableRoundedCorner from "@/components/TableRoundedCorner"
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious
+} from '@/components/ui/pagination'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@/components/ui/table'
 
 
 export default function page() {
@@ -23,6 +42,7 @@ export default function page() {
         <>
             <TransactionControl openForm={openAddTransactionForm} />
             {showAddTransactionForm && <AddTransactionForm closeForm={closeAddTransactionForm} />}
+            <TransactionTable />
         </>
     )
 }
@@ -40,12 +60,14 @@ const SearchInput = () => {
 
 const TransactionControl = ({ openForm }: { openForm: () => void }) => {
     return (
-        <Card className="w-5xl m-5 mt-10">
-            <CardHeader className="flex justify-between">
-                <SearchInput />
-                <Button onClick={openForm}>Add Transaction</Button>
-            </CardHeader>
-        </Card>
+        <>
+            <Card className="w-5xl m-5 mt-10">
+                <CardHeader className="flex justify-between">
+                    <SearchInput />
+                    <Button onClick={openForm}>Add Transaction</Button>
+                </CardHeader>
+            </Card>
+        </>
     );
 };
 
@@ -78,7 +100,7 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
         } catch (error) {
             alert("Failed to add Transaction. Please try again.");
         }
-    };  
+    };
 
     return (
         <Card className="w-5xl m-5">
@@ -122,7 +144,7 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
                         mapping={(item: any) => ({ value: item.name, label: item.name })}
                         label='Category'
                     />
-                                       <Label>Description</Label>
+                    <Label>Description</Label>
                     <Input type="text" placeholder="Description"
                         value={formData.description}
                         className="w-1/2"
@@ -139,22 +161,85 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
     );
 }
 
-const RemoteHookInput = ({
-    placeholder = "Remote Hook Input",
-    apiUrl = "",
-    onChange = () => { },
-    value = "",
-    className = "",
-    ...props
-}: {
-    placeholder?: string,
-    apiUrl?: string,
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
-    value?: string,
-    className?: string,
-}) => {
+
+const TransactionTable = () => {
+    // Example usage in a parent component
+
+    const invoices = [
+        {
+            Amount: 100.00,
+            date: '2023-10-01',
+            description: 'Grocery Shopping',
+            type: 'Expense',
+            category: 'Groceries'
+        },
+        {
+            Amount: 2500.00,
+            date: '2023-10-02',
+            description: 'Salary for September',
+            type: 'Income',
+            category: 'Salary'
+        },
+        {
+            Amount: 50.00,
+            date: '2023-10-03',
+            description: 'Coffee at Cafe',
+            type: 'Expense',
+            category: 'Dining'
+        },
+        {
+            Amount: 200.00,
+            date: '2023-10-04',
+            description: 'Electricity Bill',
+            type: 'Expense',
+            category: 'Utilities'
+        }
+
+    ]
+
+    const columns = [
+        { header: 'Amount', accessor: 'Amount', className: 'w-25' },
+        { header: 'Date', accessor: 'date' },
+        { header: 'Description', accessor: 'description' },
+        { header: 'Type', accessor: 'type' },
+        { header: 'Category', accessor: 'category', className: 'text-right' }
+    ]
 
     return (
-        <Input type="text" placeholder={placeholder} onChange={onChange} value={value} className={className} {...props} />
-    );
+        <Card className="w-5xl m-5 mt-2">
+            <CardContent>
+
+                <TableRoundedCorner
+                    columns={columns}
+                    data={invoices}
+                    pagination={
+                        <Pagination className='mt-4'>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious href='#' />
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationLink href='#'>1</PaginationLink>
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationLink href='#' isActive>
+                                        2
+                                    </PaginationLink>
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationLink href='#'>3</PaginationLink>
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationEllipsis />
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationNext href='#' />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    }
+                />
+            </CardContent>
+        </Card>
+    )
 }

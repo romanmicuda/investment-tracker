@@ -20,23 +20,21 @@ import com.personal.finance.tracker.demo.transactionType.model.TransactionType;
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final CategoryService categoryService;
-    private final UserProviderService userProviderService;   
+    private final CategoryService categoryService;  
     
-    public TransactionServiceImpl(TransactionRepository transactionRepository, CategoryService categoryService, UserProviderService userProviderService) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository, CategoryService categoryService) {
         this.transactionRepository = transactionRepository;
         this.categoryService = categoryService;
-        this.userProviderService = userProviderService;
     }
 
     @Override
-    public Transaction createTransaction(TransactionRequest transaction) throws NotFoundException {
-        AppUser appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
+    public Transaction createTransaction(TransactionRequest transaction, AppUser appUser) throws NotFoundException {
         Transaction newTransaction = new Transaction();
         newTransaction.setAmount(transaction.getAmount());
         newTransaction.setType(TransactionType.valueOf(transaction.getType().toUpperCase()));
         newTransaction.setDescription(transaction.getDescription());
         newTransaction.setDate(transaction.getDate());
+        newTransaction.setUser(appUser);
         Category category = categoryService.getCategoryByName(transaction.getCategory(),appUser);
         newTransaction.setCategory(category);
         return transactionRepository.save(newTransaction);
