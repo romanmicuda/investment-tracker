@@ -162,30 +162,86 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
 }
 
 
-interface IPredicateRequest {
-    page: number;
-    limit: number;
-    sortBy: string;
-}   
-
 const TransactionTable = () => {
-    const [invoices, setInvoices] = useState<any[]>([]);
+    const [allTransactions, setAllTransactions] = useState<any[]>([]);
+    const [displayedTransactions, setDisplayedTransactions] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const [itemsPerPage] = useState<number>(2); // Showing more items per page
 
+    // Fetch all transactions only once on component mount
     useEffect(() => {
-        const fetchInvoices = async () => {
+        const fetchAllTransactions = async () => {
             try {
-                const response = await api.get("api/transaction/all");
+                setLoading(true);
+                // Fetch all transactions without pagination parameters
+                const response = await api.get(`api/transaction/all`);
                 if (response.status === 200) {
-                    setInvoices(response.data);
-                    console.log("Invoices fetched successfully:", response.data);
+                    // Store all transactions
+                    const transactions = Array.isArray(response.data) ? 
+                        response.data : (response.data.items || []);
+                    
+                    setAllTransactions(transactions);
+                    
+                    // Calculate total pages based on all transactions
+                    setTotalPages(Math.ceil(transactions.length / itemsPerPage));
+                    
+                    // Set initial displayed transactions
+                    updateDisplayedTransactions(transactions, 1);
                 }
             } catch (error) {
+                alert("Failed to fetch transactions. Please try again later.");
+                console.error(error);
+            } finally {
+                setLoading(false);
             }
         };
-        fetchInvoices();
-    }, []);
+        
+        fetchAllTransactions();
+    }, []); // Only run on component mount
+
+    // Update displayed transactions when page changes
+    useEffect(() => {
+        updateDisplayedTransactions(allTransactions, currentPage);
+    }, [currentPage, allTransactions]);
+    
+    // Function to update displayed transactions based on current page
+    const updateDisplayedTransactions = (allData: any[], page: number) => {
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        setDisplayedTransactions(allData.slice(startIndex, endIndex));
+    };
+
+    const handlePageChange = (page: number) => {
+        if (page > 0 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
+    // Generate page numbers to display
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        const maxPagesToShow = 3;
+
+        if (totalPages <= maxPagesToShow) {
+            // Show all pages if there are only a few
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            // Show first page, current page, and last page with ellipsis
+            if (currentPage === 1) {
+                pageNumbers.push(1, 2, 3);
+            } else if (currentPage === totalPages) {
+                pageNumbers.push(totalPages - 2, totalPages - 1, totalPages);
+            } else {
+                pageNumbers.push(currentPage - 1, currentPage, currentPage + 1);
+            }
+        }
+
+        return pageNumbers;
+    };
 
     const columns = [
         { header: 'Amount', accessor: 'amount', className: 'w-25' },
@@ -193,43 +249,61 @@ const TransactionTable = () => {
         { header: 'Description', accessor: 'description' },
         { header: 'Type', accessor: 'type' },
         { header: 'Category', accessor: 'category', className: 'text-right' }
-    ]
+    ];
 
     return (
         <Card className="w-5xl m-5 mt-2">
             <CardContent>
+                {loading ? (
+                    <div className="flex justify-center p-4">Loading transactions...</div>
+                ) : (
+                    <>
+                        <TableRoundedCorner
+                            columns={columns}
+                            data={displayedTransactions}
+                            pagination={
+                                <Pagination className='mt-4'>
+                                    <PaginationContent>
+                                        <PaginationItem>
+                                            <PaginationPrevious
+                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                            />
+                                        </PaginationItem>
 
-                <TableRoundedCorner
-                    columns={columns}
-                    data={invoices}
-                    pagination={
-                        <Pagination className='mt-4'>
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious href='#' />
-                                </PaginationItem>
-                                <PaginationItem>
-                                    <PaginationLink href='#'>1</PaginationLink>
-                                </PaginationItem>
-                                <PaginationItem>
-                                    <PaginationLink href='#' isActive>
-                                        2
-                                    </PaginationLink>
-                                </PaginationItem>
-                                <PaginationItem>
-                                    <PaginationLink href='#'>3</PaginationLink>
-                                </PaginationItem>
-                                <PaginationItem>
-                                    <PaginationEllipsis />
-                                </PaginationItem>
-                                <PaginationItem>
-                                    <PaginationNext href='#' />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
-                    }
-                />
+                                        {getPageNumbers().map(page => (
+                                            <PaginationItem key={page}>
+                                                <PaginationLink
+                                                    onClick={() => handlePageChange(page)}
+                                                    isActive={page === currentPage}
+                                                >
+                                                    {page}
+                                                </PaginationLink>
+                                            </PaginationItem>
+                                        ))}
+
+                                        {totalPages > 3 && currentPage < totalPages - 1 && (
+                                            <PaginationItem>
+                                                <PaginationEllipsis />
+                                            </PaginationItem>
+                                        )}
+
+                                        <PaginationItem>
+                                            <PaginationNext
+                                                onClick={() => handlePageChange(currentPage + 1)}
+                                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                            />
+                                        </PaginationItem>
+                                    </PaginationContent>
+                                </Pagination>
+                            }
+                            caption={allTransactions.length > 0 ? 
+                                `Showing ${(currentPage-1)*itemsPerPage+1}-${Math.min(currentPage*itemsPerPage, allTransactions.length)} of ${allTransactions.length} transactions` : 
+                                "No transactions found"}
+                        />
+                    </>
+                )}
             </CardContent>
         </Card>
-    )
-}
+    );
+};
