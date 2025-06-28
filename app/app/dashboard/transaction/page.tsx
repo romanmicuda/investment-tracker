@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { api } from "@/components/utils/routes"
 import ComboboxWithSearchAndButton from "@/components/ComboboxWithSearchAndButton"
 import { TypeTransaction } from "@/components/utils/data"
@@ -162,43 +162,33 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
 }
 
 
+interface IPredicateRequest {
+    page: number;
+    limit: number;
+    sortBy: string;
+}   
+
 const TransactionTable = () => {
-    // Example usage in a parent component
+    const [invoices, setInvoices] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [currentPage, setCurrentPage] = useState<number>(1);
 
-    const invoices = [
-        {
-            Amount: 100.00,
-            date: '2023-10-01',
-            description: 'Grocery Shopping',
-            type: 'Expense',
-            category: 'Groceries'
-        },
-        {
-            Amount: 2500.00,
-            date: '2023-10-02',
-            description: 'Salary for September',
-            type: 'Income',
-            category: 'Salary'
-        },
-        {
-            Amount: 50.00,
-            date: '2023-10-03',
-            description: 'Coffee at Cafe',
-            type: 'Expense',
-            category: 'Dining'
-        },
-        {
-            Amount: 200.00,
-            date: '2023-10-04',
-            description: 'Electricity Bill',
-            type: 'Expense',
-            category: 'Utilities'
-        }
-
-    ]
+    useEffect(() => {
+        const fetchInvoices = async () => {
+            try {
+                const response = await api.get("api/transaction/all");
+                if (response.status === 200) {
+                    setInvoices(response.data);
+                    console.log("Invoices fetched successfully:", response.data);
+                }
+            } catch (error) {
+            }
+        };
+        fetchInvoices();
+    }, []);
 
     const columns = [
-        { header: 'Amount', accessor: 'Amount', className: 'w-25' },
+        { header: 'Amount', accessor: 'amount', className: 'w-25' },
         { header: 'Date', accessor: 'date' },
         { header: 'Description', accessor: 'description' },
         { header: 'Type', accessor: 'type' },

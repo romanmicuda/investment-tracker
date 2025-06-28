@@ -21,7 +21,7 @@ public class Transaction {
     private double amount;
 
     @Enumerated(EnumType.STRING)
-    private TransactionType type; // INCOME / EXPENSE
+    private TransactionType type;
 
     private String description;
 

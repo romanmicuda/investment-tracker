@@ -1,5 +1,6 @@
 package com.personal.finance.tracker.demo.transaction.logic;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import com.personal.finance.tracker.demo.category.logic.CategoryService;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 import com.personal.finance.tracker.demo.transaction.data.TransactionRepository;
+import com.personal.finance.tracker.demo.transaction.web.bodies.PredicateReqeust;
 import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionCreateRequest;
 import com.personal.finance.tracker.demo.transactionType.model.TransactionType;
 
@@ -61,6 +63,15 @@ public class TransactionServiceImpl implements TransactionService {
             throw new NotFoundException("Transaction with id " + id + " not found");
         }
         transactionRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Transaction> getAllTransactions(AppUser appUser) throws NotFoundException {
+        List<Transaction> transactions = transactionRepository.findAllByUser(appUser);
+        if (transactions.isEmpty()) {
+            throw new NotFoundException("No transactions found for user " + appUser.getUsername());
+        }
+        return transactions;
     }
 
 }
