@@ -12,5 +12,5 @@ public interface CategoryService {
     public Category getCategoryById(UUID id) throws NotFoundException;
     public List<Category> getAllCategories(AppUser appUser);
     public Category saveCategory(String categoryName, AppUser appUser);
-    
+    public Category getCategoryByName(String name, AppUser appUser) throws NotFoundException;
 }

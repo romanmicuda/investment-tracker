@@ -3,25 +3,43 @@ package com.personal.finance.tracker.demo.transaction.logic;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.stereotype.Service;
 
+import com.personal.finance.tracker.demo.appUser.data.AppUser;
+import com.personal.finance.tracker.demo.appUser.logic.UserProviderService;
+import com.personal.finance.tracker.demo.category.data.Category;
+import com.personal.finance.tracker.demo.category.logic.CategoryService;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 import com.personal.finance.tracker.demo.transaction.data.TransactionRepository;
+import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionRequest;
+import com.personal.finance.tracker.demo.transactionType.model.TransactionType;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
-
-    @Autowired
-    public TransactionServiceImpl(TransactionRepository transactionRepository) {
+    private final CategoryService categoryService;
+    private final UserProviderService userProviderService;   
+    
+    public TransactionServiceImpl(TransactionRepository transactionRepository, CategoryService categoryService, UserProviderService userProviderService) {
         this.transactionRepository = transactionRepository;
+        this.categoryService = categoryService;
+        this.userProviderService = userProviderService;
     }
 
     @Override
-    public Transaction createTransaction(Transaction transaction) {
-        return transactionRepository.save(transaction);
+    public Transaction createTransaction(TransactionRequest transaction) throws NotFoundException {
+        AppUser appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
+        Transaction newTransaction = new Transaction();
+        newTransaction.setAmount(transaction.getAmount());
+        newTransaction.setType(TransactionType.valueOf(transaction.getType().toUpperCase()));
+        newTransaction.setDescription(transaction.getDescription());
+        newTransaction.setDate(transaction.getDate());
+        Category category = categoryService.getCategoryByName(transaction.getCategory(),appUser);
+        newTransaction.setCategory(category);
+        return transactionRepository.save(newTransaction);
     }
 
     @Override

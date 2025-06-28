@@ -19,14 +19,14 @@ const items = [
     icon: Home,
   },
   {
-    title: "Income",
-    url: "/dashboard/income",
+    title: "Transactions",
+    url: "/dashboard/transaction",
     icon: DollarSign,
   },
-  {
-    title: "Expense",
-    url: "/dashboard/expense",
-    icon: ArrowDownCircle,
+   {
+    title: "Category",
+    url: "/dashboard/category",
+    icon: Inbox,
   },
   {
     title: "Settings",

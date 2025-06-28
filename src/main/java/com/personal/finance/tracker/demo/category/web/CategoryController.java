@@ -7,6 +7,8 @@ import com.personal.finance.tracker.demo.appUser.data.AppUser;
 import com.personal.finance.tracker.demo.appUser.logic.UserProviderService;
 import com.personal.finance.tracker.demo.category.data.Category;
 import com.personal.finance.tracker.demo.category.logic.CategoryService;
+import com.personal.finance.tracker.demo.category.web.bodies.CategoryResponse;
+import com.personal.finance.tracker.demo.category.web.bodies.CreateCategoryRequest;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -37,16 +41,18 @@ public class CategoryController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Category>> getAllCategories() throws NotFoundException {
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() throws NotFoundException {
         AppUser appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
-        return ResponseEntity.ok(categoryService.getAllCategories(appUser));
+        return ResponseEntity.ok(categoryService.getAllCategories(appUser).stream()
+                .map(CategoryResponse::new)
+            .collect((Collectors.toList())));
     }
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestBody String category) throws NotFoundException {
+    public ResponseEntity<Category> createCategory(@RequestBody CreateCategoryRequest request) throws NotFoundException {
         AppUser appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
 
-        Category savedCategory = categoryService.saveCategory(category, appUser);
+        Category savedCategory = categoryService.saveCategory(request.getCategory(), appUser);
         return ResponseEntity.ok(savedCategory);
     }
     

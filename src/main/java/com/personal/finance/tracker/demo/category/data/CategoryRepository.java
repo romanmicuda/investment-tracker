@@ -17,6 +17,7 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
     // Example of a custom query method:
     // List<Category> findByUser(AppUser user);
 
-
+    public Category findByNameAndUser(String name, AppUser appUser);
     public List<Category> findAllByUser(AppUser appUser);
+
 }

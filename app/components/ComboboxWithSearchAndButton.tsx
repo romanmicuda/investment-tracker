@@ -27,27 +27,31 @@ interface ComboboxProps {
   label: string
   onAdd?: () => void
   url?: string
+  mapping?: (item: any) => { value: string; label: string }
 }
 
-const ComboboxWithSearchAndButton = ({ options, value, setValue, label, onAdd, url }: ComboboxProps) => {
+const ComboboxWithSearchAndButton = ({ options, value, setValue, label, onAdd, url, mapping }: ComboboxProps) => {
   const id = useId()
   const [open, setOpen] = useState<boolean>(false)
     const [fetchedOptions, setOptions] = useState<{ value: string; label: string }[]>(options)
 
     useEffect(() => {
-      if (url) {
-        api.get(url)
-          .then(response => response.json())
-          .then(data => {
-            const fetchedOptions = data.map((item: any) => ({
-              value: item.value,
-              label: item.label
-            }))
+      const fetchData = async () => {
+        try {
+          const response = await api.get(url)
+          if (response.status === 200) {
+            const fetchedOptions = response.data.map((item: any) => (mapping ? mapping(item) : { value: item.id, label: item.name }))
             setOptions(fetchedOptions)
-          })
-          .catch(error => console.error('Error fetching options:', error))
+          }
+        }
+        catch (error) {
+          console.error('Error fetching options:', error)
+        }
       }
-    }, [url])
+      if (url) {
+        fetchData()
+      }
+    }, [])
 
   return (
     <div className='w-full max-w-xs space-y-2'>

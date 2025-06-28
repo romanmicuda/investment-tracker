@@ -22,5 +22,6 @@ public class Category {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private AppUser user;
+
 }
 

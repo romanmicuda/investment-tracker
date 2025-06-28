@@ -36,5 +36,14 @@ public class CategoryServiceImpl implements CategoryService {
         category.setUser(appUser);
         return categoryRepository.save(category);
     }
+
+    @Override
+    public Category getCategoryByName(String name, AppUser appUser) throws NotFoundException {
+        Category category = categoryRepository.findByNameAndUser(name, appUser);
+        if (category == null) {
+            throw new NotFoundException("Category not found with name: " + name);
+        }
+        return category;
+    }
     
 }

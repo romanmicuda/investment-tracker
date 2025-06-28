@@ -12,17 +12,17 @@ import { Label } from "@/components/ui/label"
 
 
 export default function page() {
-    const [showAddIncomeForm, setShowAddIncomeForm] = React.useState(false);
-    const closeAddIncomeForm = () => {
-        setShowAddIncomeForm(false);
+    const [showAddTransactionForm, setShowAddTransactionForm] = React.useState(false);
+    const closeAddTransactionForm = () => {
+        setShowAddTransactionForm(false);
     }
-    const openAddIncomeForm = () => {
-        setShowAddIncomeForm(true);
+    const openAddTransactionForm = () => {
+        setShowAddTransactionForm(true);
     }
     return (
         <>
-            <IncomeControl openForm={openAddIncomeForm} />
-            {showAddIncomeForm && <AddIncomeForm closeForm={closeAddIncomeForm} />}
+            <TransactionControl openForm={openAddTransactionForm} />
+            {showAddTransactionForm && <AddTransactionForm closeForm={closeAddTransactionForm} />}
         </>
     )
 }
@@ -38,12 +38,12 @@ const SearchInput = () => {
     )
 }
 
-const IncomeControl = ({ openForm }: { openForm: () => void }) => {
+const TransactionControl = ({ openForm }: { openForm: () => void }) => {
     return (
         <Card className="w-5xl m-5 mt-10">
             <CardHeader className="flex justify-between">
                 <SearchInput />
-                <Button onClick={openForm}>Add Income</Button>
+                <Button onClick={openForm}>Add Transaction</Button>
             </CardHeader>
         </Card>
     );
@@ -58,7 +58,7 @@ interface IFormInput {
 }
 
 
-const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
+const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
     const [formData, setFormData] = useState<IFormInput>({
         amount: 0,
         date: '',
@@ -72,25 +72,25 @@ const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
             const response = await api.post("api/transaction", data);
             if (response.status === 200) {
 
-                alert("Income added successfully!");
+                alert("Transaction added successfully!");
                 closeForm();
             }
         } catch (error) {
-            alert("Failed to add income. Please try again.");
+            alert("Failed to add Transaction. Please try again.");
         }
     };  
 
     return (
-        <Card className="w-5xl m-5 mt-10">
+        <Card className="w-5xl m-5">
             <CardHeader>
-                <CardTitle>Add Income</CardTitle>
-                <CardDescription>Fill in the details below to add a new income entry.</CardDescription>
+                <CardTitle>Add Transaction</CardTitle>
+                <CardDescription>Fill in the details below to add a new Transaction entry.</CardDescription>
             </CardHeader>
             <form className="p-4" onSubmit={(e) => {
                 e.preventDefault();
                 onSubmit(formData);
             }}>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
                     <Label>Amount</Label>
                     <Input
                         type="number"
@@ -119,6 +119,7 @@ const AddIncomeForm = ({ closeForm }: { closeForm: () => void }) => {
                         setValue={(value) => {
                             setFormData((prev) => ({ ...prev, category: value }));
                         }}
+                        mapping={(item: any) => ({ value: item.name, label: item.name })}
                         label='Category'
                     />
                                        <Label>Description</Label>

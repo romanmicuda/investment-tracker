@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 import com.personal.finance.tracker.demo.transaction.logic.TransactionService;
+import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionRequest;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class TransactionController {
     }
 
     @PostMapping    
-    public Transaction createTransaction(@RequestBody Transaction transaction) {
+    public Transaction createTransaction(@RequestBody TransactionRequest transaction) throws NotFoundException {
         return transactionService.createTransaction(transaction);
     }
 
