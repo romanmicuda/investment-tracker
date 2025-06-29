@@ -1,12 +1,11 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import React, { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import React, { useState, useEffect, use } from "react"
 import { api } from "@/components/utils/routes"
 import ComboboxWithSearchAndButton from "@/components/ComboboxWithSearchAndButton"
 import { TypeTransaction } from "@/components/utils/data"
-import Combobox from "@/components/Combobox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import TableRoundedCorner from "@/components/TableRoundedCorner"
@@ -19,19 +18,10 @@ import {
     PaginationNext,
     PaginationPrevious
 } from '@/components/ui/pagination'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow
-} from '@/components/ui/table'
-
+import { useTransactionContext } from "./TransactionContext"
 
 export default function page() {
-    const [showAddTransactionForm, setShowAddTransactionForm] = React.useState(false);
+    const [showAddTransactionForm, setShowAddTransactionForm] = useState<boolean>(false);
     const closeAddTransactionForm = () => {
         setShowAddTransactionForm(false);
     }
@@ -59,15 +49,37 @@ const SearchInput = () => {
 }
 
 const TransactionControl = ({ openForm }: { openForm: () => void }) => {
+    // Local state for the search input
+    const [inputValue, setInputValue] = useState<string>("");
+    const { setSearchTerm } = useTransactionContext();
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+    };
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setSearchTerm(inputValue);
+    };
+
     return (
-        <>
-            <Card className="w-5xl m-5 mt-10">
-                <CardHeader className="flex justify-between">
-                    <SearchInput />
-                    <Button onClick={openForm}>Add Transaction</Button>
-                </CardHeader>
-            </Card>
-        </>
+        <Card className="w-5xl m-5 mt-10">
+            <CardHeader className="flex justify-between">
+                <form onSubmit={handleSearch} className="flex gap-2">
+                    <Input
+                        type="text"
+                        placeholder="Search..."
+                        className="w-2xl"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                    />
+                    <Button type="submit">
+                        Search
+                    </Button>
+                </form>
+                <Button onClick={openForm}>Add Transaction</Button>
+            </CardHeader>
+        </Card>
     );
 };
 
@@ -169,6 +181,35 @@ const TransactionTable = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
     const [itemsPerPage] = useState<number>(2); // Showing more items per page
+    const { searchTerm } = useTransactionContext();
+
+    // Compute filtered transactions based on searchTerm
+    const filteredTransactions = React.useMemo(() => {
+        if (searchTerm && searchTerm.trim() !== "") {
+            const lowerSearch = searchTerm.toLowerCase();
+            return allTransactions.filter(transaction =>
+                (transaction.description && transaction.description.toLowerCase().includes(lowerSearch)) ||
+                (transaction.category && transaction.category.toLowerCase().includes(lowerSearch)) ||
+                (transaction.type && transaction.type.toLowerCase().includes(lowerSearch)) ||
+                (transaction.amount && transaction.amount.toString().includes(searchTerm)) ||
+                (transaction.date && transaction.date.includes(searchTerm))
+            );
+        }
+        return allTransactions;
+    }, [searchTerm, allTransactions]);
+
+    // Update totalPages and reset currentPage when filteredTransactions changes
+    useEffect(() => {
+        setTotalPages(Math.max(1, Math.ceil(filteredTransactions.length / itemsPerPage)));
+        setCurrentPage(1);
+    }, [filteredTransactions, itemsPerPage]);
+
+    // Update displayedTransactions when currentPage or filteredTransactions changes
+    useEffect(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        setDisplayedTransactions(filteredTransactions.slice(startIndex, endIndex));
+    }, [filteredTransactions, currentPage, itemsPerPage]);
 
     // Fetch all transactions only once on component mount
     useEffect(() => {
@@ -201,16 +242,16 @@ const TransactionTable = () => {
         fetchAllTransactions();
     }, []); // Only run on component mount
 
-    // Update displayed transactions when page changes
+    // Update displayed transactions when page or filter changes
     useEffect(() => {
-        updateDisplayedTransactions(allTransactions, currentPage);
-    }, [currentPage, allTransactions]);
+        updateDisplayedTransactions(filteredTransactions, currentPage);
+    }, [currentPage, filteredTransactions, itemsPerPage]);
     
     // Function to update displayed transactions based on current page
-    const updateDisplayedTransactions = (allData: any[], page: number) => {
+    const updateDisplayedTransactions = (data: any[], page: number) => {
         const startIndex = (page - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        setDisplayedTransactions(allData.slice(startIndex, endIndex));
+        setDisplayedTransactions(data.slice(startIndex, endIndex));
     };
 
     const handlePageChange = (page: number) => {
