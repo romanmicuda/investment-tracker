@@ -38,7 +38,7 @@ const ComboboxWithSearchAndButton = ({ options, value, setValue, label, onAdd, u
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await api.get(url)
+          const response = await api.get(url as string)
           if (response.status === 200) {
             const fetchedOptions = response.data.map((item: any) => (mapping ? mapping(item) : { value: item.id, label: item.name }))
             setOptions(fetchedOptions)
@@ -67,7 +67,7 @@ const ComboboxWithSearchAndButton = ({ options, value, setValue, label, onAdd, u
           >
             <span className={cn('truncate', !value && 'text-muted-foreground')}>
               {value ? (
-                options.find(option => option.value === value)?.label
+                fetchedOptions.find(option => option.value === value)?.label
               ) : (
                 <span className='text-muted-foreground'>Select {label}</span>
               )}

@@ -84,7 +84,7 @@ const TransactionControl = ({ openForm }: { openForm: () => void }) => {
 };
 
 interface IFormInput {
-    amount: number;
+    amount: number | null; // Allow null for initial state
     date: string;
     type: string;
     category: string;
@@ -94,7 +94,7 @@ interface IFormInput {
 
 const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
     const [formData, setFormData] = useState<IFormInput>({
-        amount: 0,
+        amount: null,
         date: '',
         type: '',
         category: '',
@@ -131,7 +131,7 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
                             type="number"
                             step="any"
                             placeholder="Amount"
-                            value={formData.amount}
+                            value={formData.amount ?? ''}
                             className="w-full"
                             onChange={(e) => setFormData((prev) => ({ ...prev, amount: parseFloat(e.target.value) }))}
                         />
