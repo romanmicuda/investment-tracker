@@ -3,8 +3,9 @@ package com.personal.finance.tracker.demo.investment.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.UUID;
 
-import com.personal.finance.tracker.demo.appUser.model.AppUser;
+import com.personal.finance.tracker.demo.appUser.data.AppUser;
 
 @Entity
 @Getter @Setter
@@ -12,8 +13,8 @@ import com.personal.finance.tracker.demo.appUser.model.AppUser;
 public class Investment {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     private String assetName;
     private double quantity;
