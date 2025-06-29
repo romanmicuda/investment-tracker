@@ -115,7 +115,7 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
     };
 
     return (
-        <Card className="w-5xl m-5">
+        <Card className="w-8xl m-5 flex justify-center">
             <CardHeader>
                 <CardTitle>Add Transaction</CardTitle>
                 <CardDescription>Fill in the details below to add a new Transaction entry.</CardDescription>
@@ -124,43 +124,53 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
                 e.preventDefault();
                 onSubmit(formData);
             }}>
-                <div className="flex flex-col gap-2">
-                    <Label>Amount</Label>
-                    <Input
-                        type="number"
-                        step="any"
-                        placeholder="Amount"
-                        value={formData.amount}
-                        className="w-1/2"
-                        onChange={(e) => setFormData((prev) => ({ ...prev, amount: parseFloat(e.target.value) }))}
-                    />
-                    <Label>Date</Label>
-                    <Input type="date" placeholder="Date"
-                        value={formData.date}
-                        className="w-1/2"
-                        onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
-                    />
-                    <ComboboxWithSearchAndButton
-                        options={TypeTransaction}
-                        value={formData.type}
-                        setValue={(value) => setFormData((prev) => ({ ...prev, type: value }))}
-                        label='Transaction Type'
-                    />
-                    <ComboboxWithSearchAndButton
-                        options={[]}
-                        url={"category/all"}
-                        value={formData.category}
-                        setValue={(value) => {
-                            setFormData((prev) => ({ ...prev, category: value }));
-                        }}
-                        mapping={(item: any) => ({ value: item.name, label: item.name })}
-                        label='Category'
-                    />
-                    <Label>Description</Label>
-                    <Input type="text" placeholder="Description"
-                        value={formData.description}
-                        className="w-1/2"
-                        onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))} />
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1">
+                        <Label>Amount</Label>
+                        <Input
+                            type="number"
+                            step="any"
+                            placeholder="Amount"
+                            value={formData.amount}
+                            className="w-full"
+                            onChange={(e) => setFormData((prev) => ({ ...prev, amount: parseFloat(e.target.value) }))}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <Label>Date</Label>
+                        <Input type="date" placeholder="Date"
+                            value={formData.date}
+                            className="w-full"
+                            onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <ComboboxWithSearchAndButton
+                            options={TypeTransaction}
+                            value={formData.type}
+                            setValue={(value) => setFormData((prev) => ({ ...prev, type: value }))}
+                            label='Transaction Type'
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <ComboboxWithSearchAndButton
+                            options={[]}
+                            url={"category/all"}
+                            value={formData.category}
+                            setValue={(value) => {
+                                setFormData((prev) => ({ ...prev, category: value }));
+                            }}
+                            mapping={(item: any) => ({ value: item.name, label: item.name })}
+                            label='Category'
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1 col-span-2">
+                        <Label>Description</Label>
+                        <Input type="text" placeholder="Description"
+                            value={formData.description}
+                            className="w-full"
+                            onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))} />
+                    </div>
                 </div>
                 <div className="flex justify-end mt-4">
                     <Button type="button" onClick={() => closeForm()}>Cancel</Button>
@@ -220,14 +230,14 @@ const TransactionTable = () => {
                 const response = await api.get(`api/transaction/all`);
                 if (response.status === 200) {
                     // Store all transactions
-                    const transactions = Array.isArray(response.data) ? 
+                    const transactions = Array.isArray(response.data) ?
                         response.data : (response.data.items || []);
-                    
+
                     setAllTransactions(transactions);
-                    
+
                     // Calculate total pages based on all transactions
                     setTotalPages(Math.ceil(transactions.length / itemsPerPage));
-                    
+
                     // Set initial displayed transactions
                     updateDisplayedTransactions(transactions, 1);
                 }
@@ -238,7 +248,7 @@ const TransactionTable = () => {
                 setLoading(false);
             }
         };
-        
+
         fetchAllTransactions();
     }, []); // Only run on component mount
 
@@ -246,7 +256,7 @@ const TransactionTable = () => {
     useEffect(() => {
         updateDisplayedTransactions(filteredTransactions, currentPage);
     }, [currentPage, filteredTransactions, itemsPerPage]);
-    
+
     // Function to update displayed transactions based on current page
     const updateDisplayedTransactions = (data: any[], page: number) => {
         const startIndex = (page - 1) * itemsPerPage;
@@ -338,8 +348,8 @@ const TransactionTable = () => {
                                     </PaginationContent>
                                 </Pagination>
                             }
-                            caption={allTransactions.length > 0 ? 
-                                `Showing ${(currentPage-1)*itemsPerPage+1}-${Math.min(currentPage*itemsPerPage, allTransactions.length)} of ${allTransactions.length} transactions` : 
+                            caption={allTransactions.length > 0 ?
+                                `Showing ${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, allTransactions.length)} of ${allTransactions.length} transactions` :
                                 "No transactions found"}
                         />
                     </>
