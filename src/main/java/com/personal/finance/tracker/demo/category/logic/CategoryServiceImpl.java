@@ -45,5 +45,12 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return category;
     }
+
+    @Override
+    public void deleteCategory(UUID id) throws NotFoundException {
+        Category category = getCategoryById(id);
+        category.setDeletable(true);
+        categoryRepository.save(category);
+    }
     
 }

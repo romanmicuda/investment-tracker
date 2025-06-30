@@ -297,9 +297,9 @@ const TransactionTable = () => {
     const columns = [
         { header: 'Amount', accessor: 'amount', className: 'w-25' },
         { header: 'Date', accessor: 'date' },
-        { header: 'Description', accessor: 'description' },
         { header: 'Type', accessor: 'type' },
-        { header: 'Category', accessor: 'category', className: 'text-right' }
+        { header: 'Category', accessor: 'category' },
+        { header: 'Description', accessor: 'description', className: 'text-right' }
     ];
 
     return (

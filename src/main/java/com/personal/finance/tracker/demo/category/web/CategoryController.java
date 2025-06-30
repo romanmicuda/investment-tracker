@@ -11,6 +11,7 @@ import com.personal.finance.tracker.demo.category.web.bodies.CategoryResponse;
 import com.personal.finance.tracker.demo.category.web.bodies.CreateCategoryRequest;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +37,8 @@ public class CategoryController {
     }
     
     @GetMapping("{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable UUID id) throws NotFoundException {
-        return ResponseEntity.ok(categoryService.getCategoryById(id));
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable UUID id) throws NotFoundException {
+        return ResponseEntity.ok(new CategoryResponse(categoryService.getCategoryById(id)));
     }
 
     @GetMapping("/all")
@@ -49,11 +50,16 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestBody CreateCategoryRequest request) throws NotFoundException {
+    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CreateCategoryRequest request) throws NotFoundException {
         AppUser appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
 
         Category savedCategory = categoryService.saveCategory(request.getCategory(), appUser);
-        return ResponseEntity.ok(savedCategory);
+        return ResponseEntity.ok(new CategoryResponse(savedCategory));
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCategory(@PathVariable UUID id) throws NotFoundException {
+        categoryService.deleteCategory(id);
     }
     
 }

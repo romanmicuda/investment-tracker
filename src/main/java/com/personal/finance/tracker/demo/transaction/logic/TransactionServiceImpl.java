@@ -1,5 +1,6 @@
 package com.personal.finance.tracker.demo.transaction.logic;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,7 +70,7 @@ public class TransactionServiceImpl implements TransactionService {
     public List<Transaction> getAllTransactions(AppUser appUser) throws NotFoundException {
         List<Transaction> transactions = transactionRepository.findAllByUser(appUser);
         if (transactions.isEmpty()) {
-            throw new NotFoundException("No transactions found for user " + appUser.getUsername());
+            return new ArrayList<>();
         }
         return transactions;
     }
