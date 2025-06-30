@@ -57,9 +57,11 @@ public class CategoryController {
         return ResponseEntity.ok(new CategoryResponse(savedCategory));
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable UUID id) throws NotFoundException {
-        categoryService.deleteCategory(id);
+      @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) throws NotFoundException {
+        AppUser appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
+        categoryService.deleteCategory(id, appUser);
+        return ResponseEntity.ok().build();
     }
     
 }
