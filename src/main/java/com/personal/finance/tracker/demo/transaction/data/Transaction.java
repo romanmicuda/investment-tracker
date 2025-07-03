@@ -5,9 +5,8 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.personal.finance.tracker.demo.appUser.data.AppUser;
 import com.personal.finance.tracker.demo.category.data.Category;
-import com.personal.finance.tracker.demo.transactionType.model.TransactionType;
+import com.personal.finance.tracker.demo.user.data.User;
 
 @Entity
 @Getter @Setter
@@ -33,5 +32,5 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private AppUser user;
+    private User user;
 }

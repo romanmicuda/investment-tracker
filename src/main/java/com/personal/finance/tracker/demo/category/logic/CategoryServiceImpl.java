@@ -5,10 +5,10 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.personal.finance.tracker.demo.appUser.data.AppUser;
 import com.personal.finance.tracker.demo.category.data.Category;
 import com.personal.finance.tracker.demo.category.data.CategoryRepository;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
+import com.personal.finance.tracker.demo.user.data.User;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -25,12 +25,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getAllCategories(AppUser appUser) {
+    public List<Category> getAllCategories(User appUser) {
         return categoryRepository.findAllByUser(appUser);
     }
 
     @Override
-    public Category saveCategory(String categoryName, AppUser appUser) {
+    public Category saveCategory(String categoryName, User appUser) {
         Category category = new Category();
         category.setName(categoryName);
         category.setUser(appUser);
@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category getCategoryByName(String name, AppUser appUser) throws NotFoundException {
+    public Category getCategoryByName(String name, User appUser) throws NotFoundException {
         Category category = categoryRepository.findByNameAndUser(name, appUser);
         if (category == null) {
             throw new NotFoundException("Category not found with name: " + name);
@@ -47,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void deleteCategory(UUID id, AppUser appUser) throws NotFoundException {
+    public void deleteCategory(UUID id, User appUser) throws NotFoundException {
         Category category = getCategoryById(id);
         if (!category.getUser().equals(appUser)) {
             throw new NotFoundException("Category not found with id: " + id + " for user: " + appUser.getUsername());

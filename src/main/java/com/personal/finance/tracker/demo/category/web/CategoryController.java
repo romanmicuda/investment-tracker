@@ -3,13 +3,13 @@ package com.personal.finance.tracker.demo.category.web;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.personal.finance.tracker.demo.appUser.data.AppUser;
-import com.personal.finance.tracker.demo.appUser.logic.UserProviderService;
 import com.personal.finance.tracker.demo.category.data.Category;
 import com.personal.finance.tracker.demo.category.logic.CategoryService;
 import com.personal.finance.tracker.demo.category.web.bodies.CategoryResponse;
 import com.personal.finance.tracker.demo.category.web.bodies.CreateCategoryRequest;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
+import com.personal.finance.tracker.demo.user.data.User;
+import com.personal.finance.tracker.demo.user.logic.UserProviderService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,13 +37,13 @@ public class CategoryController {
     }
     
     @GetMapping("{id}")
-    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable UUID id) throws NotFoundException {
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable("id") UUID id) throws NotFoundException {
         return ResponseEntity.ok(new CategoryResponse(categoryService.getCategoryById(id)));
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<CategoryResponse>> getAllCategories() throws NotFoundException {
-        AppUser appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
+        User appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
         return ResponseEntity.ok(categoryService.getAllCategories(appUser).stream()
                 .map(CategoryResponse::new)
             .collect((Collectors.toList())));
@@ -51,15 +51,15 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(@RequestBody CreateCategoryRequest request) throws NotFoundException {
-        AppUser appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
+        User appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
 
         Category savedCategory = categoryService.saveCategory(request.getCategory(), appUser);
         return ResponseEntity.ok(new CategoryResponse(savedCategory));
     }
 
       @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) throws NotFoundException {
-        AppUser appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
+    public ResponseEntity<Void> deleteCategory(@PathVariable("id") UUID id) throws NotFoundException {
+        User appUser = userProviderService.getCurrentUser().orElseThrow(() -> new NotFoundException("User not found"));
         categoryService.deleteCategory(id, appUser);
         return ResponseEntity.ok().build();
     }

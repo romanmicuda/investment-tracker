@@ -13,14 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.personal.finance.tracker.demo.appUser.data.AppUser;
-import com.personal.finance.tracker.demo.appUser.logic.UserProviderService;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 import com.personal.finance.tracker.demo.transaction.logic.TransactionService;
 import com.personal.finance.tracker.demo.transaction.web.bodies.PredicateReqeust;
 import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionCreateRequest;
-
+import com.personal.finance.tracker.demo.user.data.User;
+import com.personal.finance.tracker.demo.user.logic.UserProviderService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +41,7 @@ public class TransactionController {
 
     @PostMapping    
     public ResponseEntity<Transaction> createTransaction(@RequestBody TransactionCreateRequest transaction) throws NotFoundException {
-        AppUser appUser = userProviderService.getCurrentUser()
+        User appUser = userProviderService.getCurrentUser()
                 .orElseThrow(() -> new NotFoundException("User not found"));
         return ResponseEntity.ok(transactionService.createTransaction(transaction, appUser));
     }
@@ -59,7 +58,7 @@ public class TransactionController {
 
     @GetMapping("/all")
     public ResponseEntity<List<TransactionResponse>> getAllTransactions() throws NotFoundException {
-        AppUser appUser = userProviderService.getCurrentUser()
+        User appUser = userProviderService.getCurrentUser()
                 .orElseThrow(() -> new NotFoundException("User not found"));
         List<Transaction> transactions = transactionService.getAllTransactions(appUser);
         return ResponseEntity.ok(transactions.stream().map(TransactionResponse::fromTransaction).collect(Collectors.toList()));
