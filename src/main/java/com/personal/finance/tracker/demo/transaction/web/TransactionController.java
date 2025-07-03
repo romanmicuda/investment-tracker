@@ -3,9 +3,6 @@ package com.personal.finance.tracker.demo.transaction.web;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.checkerframework.checker.units.qual.C;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 import com.personal.finance.tracker.demo.transaction.logic.TransactionService;
-import com.personal.finance.tracker.demo.transaction.web.bodies.PredicateReqeust;
 import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionCreateRequest;
 import com.personal.finance.tracker.demo.user.data.User;
 import com.personal.finance.tracker.demo.user.logic.UserProviderService;
@@ -33,7 +29,6 @@ public class TransactionController {
     private final TransactionService transactionService;
     private final UserProviderService userProviderService;
 
-    @Autowired
     public TransactionController(TransactionService transactionService, UserProviderService userProviderService) {
         this.transactionService = transactionService;
         this.userProviderService = userProviderService;
