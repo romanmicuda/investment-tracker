@@ -7,6 +7,7 @@ import com.personal.finance.tracker.demo.category.data.Category;
 import com.personal.finance.tracker.demo.category.logic.CategoryService;
 import com.personal.finance.tracker.demo.category.web.bodies.CategoryResponse;
 import com.personal.finance.tracker.demo.category.web.bodies.CreateCategoryRequest;
+import com.personal.finance.tracker.demo.category.web.bodies.RenameCategoryRequest;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.user.data.User;
 import com.personal.finance.tracker.demo.user.logic.UserProviderService;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 @RestController
@@ -36,9 +39,15 @@ public class CategoryController {
         this.userProviderService = userProviderService;
     }
     
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable("id") UUID id) throws NotFoundException {
         return ResponseEntity.ok(new CategoryResponse(categoryService.getCategoryById(id)));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponse> renameCategory(@PathVariable("id") UUID id, @RequestBody RenameCategoryRequest request) throws NotFoundException  {
+        Category category = categoryService.renameCategory(id, request.getName());
+        return ResponseEntity.ok(new CategoryResponse(category));
     }
 
     @GetMapping("/all")

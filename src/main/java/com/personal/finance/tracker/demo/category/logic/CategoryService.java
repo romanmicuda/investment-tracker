@@ -14,4 +14,5 @@ public interface CategoryService {
     public Category saveCategory(String categoryName, User appUser);
     public Category getCategoryByName(String name, User appUser) throws NotFoundException;
     public void deleteCategory(UUID id, User appUser) throws NotFoundException;
+    public Category renameCategory(UUID id, String newName) throws NotFoundException;
 }

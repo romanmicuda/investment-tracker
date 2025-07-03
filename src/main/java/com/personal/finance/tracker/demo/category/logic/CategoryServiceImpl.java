@@ -20,13 +20,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category getCategoryById(UUID id) throws NotFoundException {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
+        return categoryRepository.findByIdAndDeletableFalse(id);
     }
 
     @Override
     public List<Category> getAllCategories(User appUser) {
-        return categoryRepository.findAllByUser(appUser);
+        return categoryRepository.findAllByUserAndDeletableFalse(appUser);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category getCategoryByName(String name, User appUser) throws NotFoundException {
-        Category category = categoryRepository.findByNameAndUser(name, appUser);
+        Category category = categoryRepository.findByNameAndUserAndDeletableFalse(name, appUser);
         if (category == null) {
             throw new NotFoundException("Category not found with name: " + name);
         }
@@ -48,12 +47,22 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(UUID id, User appUser) throws NotFoundException {
-        Category category = getCategoryById(id);
+        Category category = categoryRepository.findByIdAndDeletableFalse(id);
         if (!category.getUser().equals(appUser)) {
             throw new NotFoundException("Category not found with id: " + id + " for user: " + appUser.getUsername());
         }
         category.setDeletable(true);
         categoryRepository.save(category);
+    }
+
+    @Override
+    public Category renameCategory(UUID id, String newName) throws NotFoundException {
+        Category category = categoryRepository.findByIdAndDeletableFalse(id);
+        if (category == null) {
+            throw new NotFoundException("Category not found with id: " + id);
+        }
+        category.setName(newName);
+        return categoryRepository.save(category);
     }
     
 }
