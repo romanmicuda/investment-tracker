@@ -3,7 +3,7 @@ package com.personal.finance.tracker.demo.category.data;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.personal.finance.tracker.demo.appUser.data.AppUser;
+import com.personal.finance.tracker.demo.user.data.User;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +17,8 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
     // Example of a custom query method:
     // List<Category> findByUser(AppUser user);
 
-    public Category findByNameAndUser(String name, AppUser appUser);
-    public List<Category> findAllByUser(AppUser appUser);
+    public Category findByNameAndUserAndDeletableFalse(String name, User appUser);
+    public List<Category> findAllByUserAndDeletableFalse(User appUser);
+    public Category findByIdAndDeletableFalse(UUID id);
 
 }

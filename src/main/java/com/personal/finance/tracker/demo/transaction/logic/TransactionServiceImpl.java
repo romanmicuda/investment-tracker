@@ -1,22 +1,19 @@
 package com.personal.finance.tracker.demo.transaction.logic;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.stereotype.Service;
 
-import com.personal.finance.tracker.demo.appUser.data.AppUser;
-import com.personal.finance.tracker.demo.appUser.logic.UserProviderService;
 import com.personal.finance.tracker.demo.category.data.Category;
 import com.personal.finance.tracker.demo.category.logic.CategoryService;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 import com.personal.finance.tracker.demo.transaction.data.TransactionRepository;
-import com.personal.finance.tracker.demo.transaction.web.bodies.PredicateReqeust;
+import com.personal.finance.tracker.demo.transaction.data.TransactionType;
 import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionCreateRequest;
-import com.personal.finance.tracker.demo.transactionType.model.TransactionType;
+import com.personal.finance.tracker.demo.user.data.User;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -30,7 +27,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction createTransaction(TransactionCreateRequest transaction, AppUser appUser) throws NotFoundException {
+    public Transaction createTransaction(TransactionCreateRequest transaction, User appUser) throws NotFoundException {
         Transaction newTransaction = new Transaction();
         newTransaction.setAmount(transaction.getAmount());
         newTransaction.setType(TransactionType.valueOf(transaction.getType().toUpperCase()));
@@ -66,10 +63,10 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Transaction> getAllTransactions(AppUser appUser) throws NotFoundException {
+    public List<Transaction> getAllTransactions(User appUser) throws NotFoundException {
         List<Transaction> transactions = transactionRepository.findAllByUser(appUser);
         if (transactions.isEmpty()) {
-            throw new NotFoundException("No transactions found for user " + appUser.getUsername());
+            return new ArrayList<>();
         }
         return transactions;
     }

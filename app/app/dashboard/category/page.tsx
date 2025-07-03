@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { api } from "@/components/utils/routes"
 import ComboboxWithSearchAndButton from "@/components/ComboboxWithSearchAndButton"
 import { TypeTransaction } from "@/components/utils/data"
@@ -13,6 +13,27 @@ import { Label } from "@/components/ui/label"
 
 export default function page() {
     const [showAddCategoryForm, setShowAddCategoryForm] = React.useState(false);
+    const [categories, setCategories] = React.useState<CategoryType[]>([]);
+    const [loading, setLoading] = React.useState<boolean>(true);
+
+    const fetchCategories = async () => {
+        setLoading(true);
+        try {
+            const response = await api.get("/api/category/all");
+            if (response.status === 200) {
+                setCategories(response.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch categories:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchCategories();
+    }, []);
+
     const closeAddCategoryForm = () => {
         setShowAddCategoryForm(false);
     }
@@ -22,9 +43,110 @@ export default function page() {
     return (
         <>
             <CategoryControl openForm={openAddCategoryForm} />
-            {showAddCategoryForm && <AddCategoryForm closeForm={closeAddCategoryForm} />}
+            {showAddCategoryForm && <AddCategoryForm closeForm={closeAddCategoryForm} fetchCategories={fetchCategories} />}
+            <CategoryList 
+                categories={categories}
+                loading={loading}
+                fetchCategories={fetchCategories}
+                setCategories={setCategories}
+            />
         </>
     )
+}
+
+interface CategoryType {
+    id: string;
+    name: string;
+}
+
+
+const CategoryList = ({ categories, loading, fetchCategories, setCategories }: {
+    categories: CategoryType[];
+    loading: boolean;
+    fetchCategories: () => Promise<void>;
+    setCategories: React.Dispatch<React.SetStateAction<CategoryType[]>>;
+}) => {
+    const [renamingId, setRenamingId] = useState<string | null>(null);
+    const [renameValue, setRenameValue] = useState<string>("");
+
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("Are you sure you want to delete this category?")) return;
+        try {
+            const response = await api.delete(`/api/category/${id}`);
+            console.log("Delete response:", response);
+            if (response.status === 200) {
+                await fetchCategories();
+            }
+        } catch (error) {
+
+            alert("Failed to delete category.");
+        }
+    };
+
+    const handleRename = (id: string, currentName: string) => {
+        setRenamingId(id);
+        setRenameValue(currentName);
+    };
+
+    const submitRename = async () => {
+        if (!renamingId) return;
+        try {
+            const response = await api.put(`/api/category/${renamingId}`, { name: renameValue });
+            if (response.status === 200) {
+                setRenamingId(null);
+                setRenameValue("");
+                await fetchCategories();
+            }
+        } catch (error) {
+            alert("Failed to rename category.");
+        }
+    };
+
+    return (
+        <Card className="w-5xl m-5 mt-10">
+            <CardHeader>
+                <CardTitle>Category List</CardTitle>
+                <CardDescription>List of all categories</CardDescription>
+            </CardHeader>
+            <CardContent>
+                {loading ? (
+                    <div>Loading...</div>
+                ) : (
+                    <div className="grid grid-cols-4 gap-4">
+                        {categories.length > 0 ? (
+                            categories.map((category, index) => (
+                                <Card key={category.id} className="p-4">
+                                    {renamingId === category.id ? (
+                                        <div>
+                                            <Input
+                                                value={renameValue}
+                                                onChange={e => setRenameValue(e.target.value)}
+                                                className="mb-2"
+                                            />
+                                            <div className="flex gap-2">
+                                                <Button size="sm" onClick={submitRename}>Save</Button>
+                                                <Button size="sm" variant="outline" onClick={() => setRenamingId(null)}>Cancel</Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <CardTitle>{category.name}</CardTitle>
+                                            <CardAction>
+                                                <Button variant="outline" onClick={() => handleRename(category.id, category.name)}>Rename</Button>
+                                                <Button variant="destructive" className="ml-2" onClick={() => handleDelete(category.id)}>Delete</Button>
+                                            </CardAction>
+                                        </>
+                                    )}
+                                </Card>
+                            ))
+                        ) : (
+                            <div>No categories found.</div>
+                        )}
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    );
 }
 
 const SearchInput = () => {
@@ -54,7 +176,7 @@ interface IFormInput {
 }
 
 
-const AddCategoryForm = ({ closeForm }: { closeForm: () => void }) => {
+const AddCategoryForm = ({ closeForm, fetchCategories }: { closeForm: () => void, fetchCategories: () => Promise<void> }) => {
     const [formData, setFormData] = useState<IFormInput>({
         category: ''
     });
@@ -63,6 +185,7 @@ const AddCategoryForm = ({ closeForm }: { closeForm: () => void }) => {
         try {
             const response = await api.post("/api/category", data);
             if (response.status === 200) {
+                await fetchCategories();
                 closeForm();
             }
         } catch (error) {
