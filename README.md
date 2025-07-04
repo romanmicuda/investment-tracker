@@ -1,8 +1,8 @@
-# Personal Finance Tracker
+## Investment Tracker
 
-A simple and effective tool to help you manage your finances. With Personal Finance Tracker, you can easily log expenses, track income, set budgets, and analyze your spending habits—all from a single, user-friendly application.
+A simple and effective tool to help you manage your finances. With Investment Tracker, you can easily log expenses, track income, set budgets, and analyze your spending habits—all from a single, user-friendly application.
 
-## Key Features
+### Key Features
 
 - **Expense Tracking:** Log daily expenses and categorize them for easy analysis.
 - **Income Management:** Record various sources of income to get a complete financial overview.
