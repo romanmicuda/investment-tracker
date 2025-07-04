@@ -47,7 +47,7 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable UUID id, @RequestBody Transaction transaction) throws NotFoundException {
+    public ResponseEntity<Transaction> updateTransaction(@PathVariable UUID id, @RequestBody UpdateTransactionRequest transaction) throws NotFoundException {
         return ResponseEntity.ok(transactionService.updateTransaction(id, transaction));
     }
 
