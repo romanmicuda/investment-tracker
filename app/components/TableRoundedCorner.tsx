@@ -1,4 +1,5 @@
 import React from 'react'
+import { Edit, Trash2 } from 'lucide-react'
 import {
   Pagination,
   PaginationContent,
@@ -17,6 +18,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import { Button } from './ui/button'
 
 type TableColumn<T> = {
   header: React.ReactNode
@@ -31,6 +33,8 @@ type TableRoundedCornerProps<T> = {
   footer?: React.ReactNode
   pagination?: React.ReactNode
   caption?: string
+  onEdit?: (id: string) => void
+  onDelete?: (id: string) => void
 }
 
 function TableRoundedCorner<T extends { [key: string]: any }>({
@@ -38,7 +42,9 @@ function TableRoundedCorner<T extends { [key: string]: any }>({
   data,
   footer,
   pagination,
-  caption
+  caption,
+  onEdit,
+  onDelete
 }: TableRoundedCornerProps<T>) {
   return (
     <div className='w-full'>
@@ -51,6 +57,7 @@ function TableRoundedCorner<T extends { [key: string]: any }>({
                   {col.header}
                 </TableHead>
               ))}
+              {(onEdit || onDelete)  && <TableHead>Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -63,6 +70,16 @@ function TableRoundedCorner<T extends { [key: string]: any }>({
                       : row[col.accessor]}
                   </TableCell>
                 ))}
+                <TableCell>
+                  <div className='flex items-center space-x-2'>
+                    {onEdit && (
+                      <EditButton onClick={() => onEdit(row.id)} />
+                    )}
+                    {onDelete && (
+                      <DeleteButton onClick={() => onDelete(row.id)} />
+                    )}
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -82,3 +99,26 @@ function TableRoundedCorner<T extends { [key: string]: any }>({
 }
 
 export default TableRoundedCorner
+
+
+const DeleteButton = ({ onClick }: { onClick: () => void }) => (
+  <Button
+    variant="destructive"
+    size="icon"
+    className="h-8 w-8 p-0"
+    onClick={onClick}
+  >
+    <Trash2 className="h-4 w-4" />
+  </Button>
+)
+
+const EditButton = ({ onClick }: { onClick: () => void }) => (
+  <Button
+    variant="outline"
+    size="icon"
+    className="h-8 w-8 p-0"
+    onClick={onClick}
+  >
+    <Edit className="h-4 w-4" />
+  </Button>
+)

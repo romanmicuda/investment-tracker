@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
+import com.personal.finance.tracker.demo.transaction.web.UpdateTransactionRequest;
 import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionCreateRequest;
 import com.personal.finance.tracker.demo.user.data.User;
 
@@ -16,7 +17,7 @@ public interface TransactionService {
 
     Transaction getTransactionById(UUID id) throws NotFoundException;
 
-    Transaction updateTransaction(UUID id, Transaction transaction) throws NotFoundException;
+    Transaction updateTransaction(UUID id, UpdateTransactionRequest transaction) throws NotFoundException;
     
     void deleteTransaction(UUID id) throws NotFoundException;
 

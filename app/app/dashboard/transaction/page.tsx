@@ -19,20 +19,29 @@ import {
     PaginationPrevious
 } from '@/components/ui/pagination'
 import { useTransactionContext } from "./TransactionContext"
+import { useRouter } from 'next/navigation'
 
 export default function page() {
     const [showAddTransactionForm, setShowAddTransactionForm] = useState<boolean>(false);
+    const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+    
     const closeAddTransactionForm = () => {
         setShowAddTransactionForm(false);
     }
     const openAddTransactionForm = () => {
         setShowAddTransactionForm(true);
     }
+    
+    const handleTransactionAdded = () => {
+        setRefreshTrigger(prev => prev + 1);
+        closeAddTransactionForm();
+    }
+    
     return (
         <>
             <TransactionControl openForm={openAddTransactionForm} />
-            {showAddTransactionForm && <AddTransactionForm closeForm={closeAddTransactionForm} />}
-            <TransactionTable />
+            {showAddTransactionForm && <AddTransactionForm closeForm={closeAddTransactionForm} onTransactionAdded={handleTransactionAdded} />}
+            <TransactionTable refreshTrigger={refreshTrigger} />
         </>
     )
 }
@@ -92,7 +101,7 @@ interface IFormInput {
 }
 
 
-const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
+const AddTransactionForm = ({ closeForm, onTransactionAdded }: { closeForm: () => void, onTransactionAdded: () => void }) => {
     const [formData, setFormData] = useState<IFormInput>({
         amount: null,
         date: '',
@@ -105,9 +114,8 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
         try {
             const response = await api.post("api/transaction", data);
             if (response.status === 200) {
-
                 alert("Transaction added successfully!");
-                closeForm();
+                onTransactionAdded();
             }
         } catch (error) {
             alert("Failed to add Transaction. Please try again.");
@@ -117,8 +125,6 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
     return (
         <Card className="w-8xl m-5 flex justify-center">
             <CardHeader>
-                <CardTitle>Add Transaction</CardTitle>
-                <CardDescription>Fill in the details below to add a new Transaction entry.</CardDescription>
             </CardHeader>
             <form className="p-4" onSubmit={(e) => {
                 e.preventDefault();
@@ -184,7 +190,7 @@ const AddTransactionForm = ({ closeForm }: { closeForm: () => void }) => {
 }
 
 
-const TransactionTable = () => {
+const TransactionTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
     const [allTransactions, setAllTransactions] = useState<any[]>([]);
     const [displayedTransactions, setDisplayedTransactions] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -192,6 +198,7 @@ const TransactionTable = () => {
     const [totalPages, setTotalPages] = useState<number>(1);
     const [itemsPerPage] = useState<number>(2); // Showing more items per page
     const { searchTerm } = useTransactionContext();
+    const router = useRouter();
 
     // Compute filtered transactions based on searchTerm
     const filteredTransactions = React.useMemo(() => {
@@ -250,7 +257,7 @@ const TransactionTable = () => {
         };
 
         fetchAllTransactions();
-    }, []); // Only run on component mount
+    }, [refreshTrigger]); // Add refreshTrigger as dependency
 
     // Update displayed transactions when page or filter changes
     useEffect(() => {
@@ -294,12 +301,31 @@ const TransactionTable = () => {
         return pageNumbers;
     };
 
+    const handleEditRow = (id: string) => {
+        router.push('/dashboard/transaction/' + id);
+    };
+
+    const handleDeleteRow = async (id: string) => {
+        try {
+            const response = await api.delete(`api/transaction/${id}`);
+            if (response.status === 200) {
+                alert("Transaction deleted successfully!");
+                const updatedTransactions = allTransactions.filter(transaction => transaction.id !== id);
+                setAllTransactions(updatedTransactions);
+                setTotalPages(Math.ceil(updatedTransactions.length / itemsPerPage));
+                updateDisplayedTransactions(updatedTransactions, currentPage);
+            }
+        } catch (error) {
+            alert("Failed to delete transaction. Please try again.");
+        }
+    };
+
     const columns = [
         { header: 'Amount', accessor: 'amount', className: 'w-25' },
         { header: 'Date', accessor: 'date' },
         { header: 'Type', accessor: 'type' },
         { header: 'Category', accessor: 'category' },
-        { header: 'Description', accessor: 'description', className: 'text-right' }
+        { header: 'Description', accessor: 'description' },
     ];
 
     return (
@@ -312,6 +338,8 @@ const TransactionTable = () => {
                         <TableRoundedCorner
                             columns={columns}
                             data={displayedTransactions}
+                            onDelete={handleDeleteRow}
+                            onEdit={handleEditRow}
                             pagination={
                                 <Pagination className='mt-4'>
                                     <PaginationContent>

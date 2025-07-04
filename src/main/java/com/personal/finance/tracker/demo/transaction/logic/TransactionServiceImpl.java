@@ -12,6 +12,7 @@ import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 import com.personal.finance.tracker.demo.transaction.data.TransactionRepository;
 import com.personal.finance.tracker.demo.transaction.data.TransactionType;
+import com.personal.finance.tracker.demo.transaction.web.UpdateTransactionRequest;
 import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionCreateRequest;
 import com.personal.finance.tracker.demo.user.data.User;
 
@@ -46,12 +47,19 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction updateTransaction(UUID id, Transaction transaction) throws NotFoundException {
+    public Transaction updateTransaction(UUID id, UpdateTransactionRequest transaction) throws NotFoundException {
         if (!transactionRepository.existsById(id)) {
             throw new NotFoundException("Transaction with id " + id + " not found");
         }
-        transaction.setId(id);
-        return transactionRepository.save(transaction);
+        Transaction existingTransaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Transaction with id " + id + " not found"));
+        existingTransaction.setAmount(transaction.getAmount());
+        existingTransaction.setType(TransactionType.valueOf(transaction.getType().toUpperCase()));
+        existingTransaction.setDescription(transaction.getDescription());
+        existingTransaction.setDate(java.time.LocalDate.parse(transaction.getDate()));
+        Category category = categoryService.getCategoryByName(transaction.getCategory(), existingTransaction.getUser());
+        existingTransaction.setCategory(category);
+        return transactionRepository.save(existingTransaction);
     }
 
     @Override
@@ -70,5 +78,6 @@ public class TransactionServiceImpl implements TransactionService {
         }
         return transactions;
     }
+
 
 }
