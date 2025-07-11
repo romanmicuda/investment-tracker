@@ -28,6 +28,10 @@ const items = [
     url: "/dashboard/category",
     icon: Inbox,
   },
+  {title: "Investments",
+    url: "/dashboard/investment",
+    icon: ArrowDownCircle,
+  },
   {
     title: "Settings",
     url: "/dashboard/settings",
