@@ -9,7 +9,6 @@ public class InvestmentRequest {
     private String assetName;
     private double quantity;
     private double buyPrice;
-    private Double currentPrice;
     private LocalDate buyDate;
     private String notes;
 }

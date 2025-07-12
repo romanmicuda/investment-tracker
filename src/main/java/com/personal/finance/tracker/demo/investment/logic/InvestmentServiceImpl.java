@@ -43,7 +43,6 @@ public class InvestmentServiceImpl implements InvestmentService {
         newInvestment.setAssetName(request.getAssetName());
         newInvestment.setQuantity(request.getQuantity());
         newInvestment.setBuyPrice(request.getBuyPrice());
-        newInvestment.setCurrentPrice(request.getCurrentPrice());
         newInvestment.setBuyDate(request.getBuyDate());
         newInvestment.setNotes(request.getNotes());
         return investementRepository.save(newInvestment);

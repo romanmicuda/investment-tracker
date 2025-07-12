@@ -1,11 +1,15 @@
+'use client'
+
+import { api, secureApi } from '@/components/utils/routes';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export interface Investment {
-    id: string;
-    name: string;
-    amount: number;
-    date: string;
-    type: string;
+type Investment = {
+    assetName: string
+    quantity: number
+    buyPrice: number
+    currentPrice?: number // Optional to match Double in Java
+    buyDate: string // ISO date string
+    notes?: string
 }
 
 interface InvestmentContextType {
@@ -31,8 +35,17 @@ export const InvestmentProvider = ({ children }: { children: ReactNode }) => {
     const [investments, setInvestments] = useState<Investment[]>([]);
     const [showAddInvestmentForm, setShowAddInvestmentForm] = useState(false);
 
-    const addInvestment = (investment: Investment) => {
-        setInvestments(prev => [...prev, investment]);
+    const addInvestment = async (investment: Investment) => {
+        try {
+            const response = await api.post('api/investments', investment);
+            if (response.status === 201 || response.status === 200) {
+                alert('Investment added successfully');
+            } else {
+                alert('Failed to add investment');
+            }
+        } catch (error) {
+            alert('An error occurred while adding the investment.');
+        }
     };
 
     const removeInvestment = (id: string) => {

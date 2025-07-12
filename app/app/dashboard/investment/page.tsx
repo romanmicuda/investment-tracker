@@ -8,17 +8,17 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { DataTable } from './Table'
+import { useInvestmentContext } from './InvestmentContext'
 
 
 // Define your investment data type to match Java model
 type Investment = {
-  id: string
-  assetName: string
-  quantity: number
-  buyPrice: number
-  currentPrice?: number // Optional to match Double in Java
-  buyDate: string // ISO date string
-  notes?: string
+    assetName: string
+    quantity: number
+    buyPrice: number
+    currentPrice?: number // Optional to match Double in Java
+    buyDate: string // ISO date string
+    notes?: string
 }
 
 const page = () => {
@@ -34,6 +34,7 @@ const page = () => {
 export default page
 
 const Control = () => {
+    const { setShowAddInvestmentForm } = useInvestmentContext()
     return (
         <Card className="w-5xl m-5 mt-10">
             <CardHeader className="flex justify-between">
@@ -47,18 +48,87 @@ const Control = () => {
                         Search
                     </Button>
                 </form>
-                <Button>Add Investment</Button>
+                <Button onClick={() =>
+                    setShowAddInvestmentForm((prev: boolean) => !prev)}>
+                    Add Investment</Button>
             </CardHeader>
         </Card>
     )
 }
 
 const InvestementForm = () => {
+    const { showAddInvestmentForm, setShowAddInvestmentForm,
+        addInvestment
+     } = useInvestmentContext()
+    if (!showAddInvestmentForm) return null
     return (
         <Card className="w-5xl m-5 mt-10">
-            {/* Add your investment form here */}
-        </Card> 
-    )   
+            <CardHeader>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault()
+                        const formData = new FormData(e.currentTarget)
+                        const newInvestment: Investment = {
+                            assetName: formData.get('assetName') as string,
+                            quantity: parseFloat(formData.get('quantity') as string),
+                            buyPrice: parseFloat(formData.get('buyPrice') as string),
+                            buyDate: formData.get('buyDate') as string,
+                            notes: formData.get('notes') as string || ''
+                        }
+                        addInvestment(newInvestment)
+                        setShowAddInvestmentForm(false)
+                    }
+                    }
+                >
+                    <div className="flex flex-col gap-4">
+
+                        <Input
+                            type="text"
+                            placeholder="Asset Name"
+                            className="w-full"
+                            name="assetName"
+                        />
+                        <Input
+                            type="number"
+                            placeholder="Quantity"
+                            className="w-full"
+                            name="quantity"
+                            step="any"
+                            min="0"
+                        />
+                        <Input
+                            type="number"
+                            placeholder="Buy Price"
+                            className="w-full"
+                            name="buyPrice"
+                            step="any"
+                            min="0"
+                        />
+                        <Input
+                            type="date"
+                            placeholder="Buy Date"
+                            className="w-full"
+                            name="buyDate"
+                        />
+                        <Input
+                            type="text"
+                            placeholder="Notes"
+                            className="w-full"
+                            name="notes"
+                        />
+                        <div className="flex gap-2 mt-2">
+                            <Button type="submit">Save Investment</Button>
+                            <Button variant="outline" onClick={() => setShowAddInvestmentForm(false)}>
+                                Cancel
+                            </Button>
+
+                        </div>
+
+                    </div>
+                </form>
+            </CardHeader>
+        </Card>
+    )
 }
 
 const InvestmentTable = () => {
@@ -67,17 +137,17 @@ const InvestmentTable = () => {
     // Helper function to calculate gain/loss
     const calculateGainLoss = (quantity: number, buyPrice: number, currentPrice?: number) => {
         if (!currentPrice) return { gainLoss: 0, gainLossPercent: 0, status: 'Unknown' as const }
-        
+
         const totalBuyValue = quantity * buyPrice
         const totalCurrentValue = quantity * currentPrice
         const gainLoss = totalCurrentValue - totalBuyValue
         const gainLossPercent = (gainLoss / totalBuyValue) * 100
-        
+
         let status: 'Profitable' | 'Loss' | 'Break Even' | 'Unknown'
         if (gainLoss > 0) status = 'Profitable'
         else if (gainLoss < 0) status = 'Loss'
         else status = 'Break Even'
-        
+
         return { gainLoss, gainLossPercent, status }
     }
 
@@ -138,7 +208,7 @@ const InvestmentTable = () => {
                 const quantity = row.getValue('quantity') as number
                 const currentPrice = row.getValue('currentPrice') as number | undefined
                 const buyPrice = row.getValue('buyPrice') as number
-                
+
                 const value = currentPrice ? quantity * currentPrice : quantity * buyPrice
                 return (
                     <div className="text-right font-medium">
@@ -154,14 +224,14 @@ const InvestmentTable = () => {
                 const quantity = row.getValue('quantity') as number
                 const buyPrice = row.getValue('buyPrice') as number
                 const currentPrice = row.getValue('currentPrice') as number | undefined
-                
+
                 const { gainLoss } = calculateGainLoss(quantity, buyPrice, currentPrice)
                 const isPositive = gainLoss >= 0
-                
+
                 if (!currentPrice) {
                     return <div className="text-right text-gray-500">N/A</div>
                 }
-                
+
                 return (
                     <div className={`text-right font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
                         {isPositive ? '+' : ''}${gainLoss.toFixed(2)}
@@ -176,14 +246,14 @@ const InvestmentTable = () => {
                 const quantity = row.getValue('quantity') as number
                 const buyPrice = row.getValue('buyPrice') as number
                 const currentPrice = row.getValue('currentPrice') as number | undefined
-                
+
                 const { gainLossPercent } = calculateGainLoss(quantity, buyPrice, currentPrice)
                 const isPositive = gainLossPercent >= 0
-                
+
                 if (!currentPrice) {
                     return <div className="text-right text-gray-500">N/A</div>
                 }
-                
+
                 return (
                     <div className={`text-right font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
                         {isPositive ? '+' : ''}{gainLossPercent.toFixed(2)}%
@@ -198,9 +268,9 @@ const InvestmentTable = () => {
                 const quantity = row.getValue('quantity') as number
                 const buyPrice = row.getValue('buyPrice') as number
                 const currentPrice = row.getValue('currentPrice') as number | undefined
-                
+
                 const { status } = calculateGainLoss(quantity, buyPrice, currentPrice)
-                
+
                 const statusStyles = {
                     'Profitable': 'bg-green-100 text-green-800 hover:bg-green-200',
                     'Loss': 'bg-red-100 text-red-800 hover:bg-red-200',
@@ -283,8 +353,8 @@ const InvestmentTable = () => {
 
     return (
         <Card className="w-5xl m-5 p-5 mt-10">
-            <DataTable 
-                data={investments} 
+            <DataTable
+                data={investments}
                 columns={columns}
                 initialPageSize={10}
                 initialSorting={[
