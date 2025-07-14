@@ -1,13 +1,17 @@
 package com.personal.finance.tracker.demo.investment.logic;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.investment.data.Investment;
 import com.personal.finance.tracker.demo.investment.data.InvestmentRepository;
+import com.personal.finance.tracker.demo.investment.web.AllInvestementReqeust;
 import com.personal.finance.tracker.demo.investment.web.bodies.InvestmentRequest;
 import com.personal.finance.tracker.demo.investment.web.bodies.UpdateInvestmentRequest;
 
@@ -62,6 +66,10 @@ public class InvestmentServiceImpl implements InvestmentService {
         } else {
             throw new NotFoundException("Investment with id " + id + " not found");
         }
+    }
+    @Override
+    public Page<Investment> getAllInvestments(AllInvestementReqeust request) {
+       return investementRepository.findAll(PageRequest.of(request.getPageNumber(), request.getPageSize()));
     }
     
 }

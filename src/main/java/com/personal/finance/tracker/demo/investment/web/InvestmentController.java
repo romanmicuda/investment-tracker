@@ -1,7 +1,9 @@
 package com.personal.finance.tracker.demo.investment.web;
 
+import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +35,15 @@ public class InvestmentController {
     public ResponseEntity<InvestmentResponse> getInvestmentById(@PathVariable("id") UUID id) throws NotFoundException {
         Investment investment = investmentService.getInvestmentById(id);
         return ResponseEntity.ok(new InvestmentResponse(investment));
+    }
+
+    @PostMapping("/all")
+    public ResponseEntity<List<InvestmentResponse>> getAllInvestments(@RequestBody AllInvestementReqeust request) {
+        Page<Investment> investments = investmentService.getAllInvestments(request);
+        List<InvestmentResponse> investmentResponses = investments.stream()
+                .map(InvestmentResponse::new)
+                .toList();
+        return ResponseEntity.ok(investmentResponses);
     }
 
     @DeleteMapping("/{id}")

@@ -4,6 +4,7 @@ import { api, secureApi } from '@/components/utils/routes';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type Investment = {
+    id?: string // Add optional id field
     assetName: string
     quantity: number
     buyPrice: number
@@ -17,8 +18,11 @@ interface InvestmentContextType {
     addInvestment: (investment: Investment) => void;
     removeInvestment: (id: string) => void;
     updateInvestment: (investment: Investment) => void;
+    getInvestements: () => void;
     showAddInvestmentForm: boolean;
     setShowAddInvestmentForm: (show: boolean) => void;
+    tableSetup: TableSetupType;
+    setTableSetup: (setup: TableSetupType) => void;
 }
 
 const InvestmentContext = createContext<InvestmentContextType | undefined>(undefined);
@@ -31,9 +35,15 @@ export const useInvestmentContext = () => {
     return context;
 };
 
+export type TableSetupType = {
+    pageNumber: number;
+    pageSize: number;
+}
+
 export const InvestmentProvider = ({ children }: { children: ReactNode }) => {
     const [investments, setInvestments] = useState<Investment[]>([]);
     const [showAddInvestmentForm, setShowAddInvestmentForm] = useState(false);
+    const [tableSetup, setTableSetup] = useState<TableSetupType>({pageNumber: 0, pageSize: 5})
 
     const addInvestment = async (investment: Investment) => {
         try {
@@ -58,9 +68,28 @@ export const InvestmentProvider = ({ children }: { children: ReactNode }) => {
         );
     };
 
+    const getInvestements = async () => {
+        try {
+            const response = await api.post('api/investments/all', tableSetup);
+            if (response.status === 200) {
+                console.log('Fetched investments:', response.data);
+                setInvestments(response.data as (Investment[]));
+                console.log('Investments state updated:', investments);
+            } else {
+                alert('Failed to fetch investments');
+            }
+        }
+        catch (error) {
+            console.error('Error fetching investments:', error);
+            alert('An error occurred while fetching investments.');
+        }
+    };
+
+
     return (
         <InvestmentContext.Provider
-            value={{ investments, addInvestment, removeInvestment, updateInvestment, showAddInvestmentForm, setShowAddInvestmentForm }}
+            value={{ investments, addInvestment, removeInvestment, tableSetup, setTableSetup,
+                 updateInvestment, getInvestements, showAddInvestmentForm, setShowAddInvestmentForm }}
         >
             {children}
         </InvestmentContext.Provider>

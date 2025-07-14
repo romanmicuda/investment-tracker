@@ -38,6 +38,8 @@ interface DataTableProps<TData> {
   showRowsPerPage?: boolean
   emptyMessage?: string
   className?: string
+  onPageSizeChange: (pageSize: number) => void
+  onPageNumberChange?: (pageNumber: number) => void
 }
 
 export function DataTable<TData>({
@@ -49,7 +51,9 @@ export function DataTable<TData>({
   showPagination = true,
   showRowsPerPage = true,
   emptyMessage = 'No results.',
-  className
+  className,
+  onPageSizeChange,
+  onPageNumberChange
 }: DataTableProps<TData>) {
   const id = useId()
 
@@ -146,6 +150,7 @@ export function DataTable<TData>({
                 value={table.getState().pagination.pageSize.toString()}
                 onValueChange={value => {
                   table.setPageSize(Number(value))
+                  onPageSizeChange(Number(value))
                 }}
               >
                 <SelectTrigger id={id} className='w-fit whitespace-nowrap'>
@@ -187,7 +192,10 @@ export function DataTable<TData>({
                     size='icon'
                     variant='outline'
                     className='disabled:pointer-events-none disabled:opacity-50'
-                    onClick={() => table.firstPage()}
+                    onClick={() => {table.firstPage()
+                          onPageNumberChange(1)
+                    }
+                    }
                     disabled={!table.getCanPreviousPage()}
                     aria-label='Go to first page'
                   >
@@ -200,7 +208,10 @@ export function DataTable<TData>({
                     size='icon'
                     variant='outline'
                     className='disabled:pointer-events-none disabled:opacity-50'
-                    onClick={() => table.previousPage()}
+                    onClick={() => {table.previousPage()
+                          onPageNumberChange(table.getState().pagination.pageIndex)
+                    }
+                    }
                     disabled={!table.getCanPreviousPage()}
                     aria-label='Go to previous page'
                   >
@@ -213,7 +224,10 @@ export function DataTable<TData>({
                     size='icon'
                     variant='outline'
                     className='disabled:pointer-events-none disabled:opacity-50'
-                    onClick={() => table.nextPage()}
+                    onClick={() => {table.nextPage()
+                      onPageNumberChange(table.getState().pagination.pageIndex + 2)
+                    }
+                    }
                     disabled={!table.getCanNextPage()}
                     aria-label='Go to next page'
                   >
@@ -226,7 +240,10 @@ export function DataTable<TData>({
                     size='icon'
                     variant='outline'
                     className='disabled:pointer-events-none disabled:opacity-50'
-                    onClick={() => table.lastPage()}
+                    onClick={() => {table.lastPage()
+                      onPageNumberChange(Math.ceil(table.getRowCount() / table.getState().pagination.pageSize))
+                    }
+                    }
                     disabled={!table.getCanNextPage()}
                     aria-label='Go to last page'
                   >

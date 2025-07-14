@@ -56,6 +56,11 @@ const Control = () => {
     )
 }
 
+interface TableSetupType {
+    pageNumber: number;
+    pageSize: number;
+}
+
 const InvestementForm = () => {
     const { showAddInvestmentForm, setShowAddInvestmentForm,
         addInvestment
@@ -132,8 +137,15 @@ const InvestementForm = () => {
 }
 
 const InvestmentTable = () => {
-    const [investments, setInvestments] = useState<Investment[]>([])
+    const { getInvestements, investments, tableSetup, setTableSetup  } = useInvestmentContext()
 
+    useEffect(() => {
+        getInvestements()
+    }, [tableSetup])
+
+    useEffect(() => {
+        console.log('TINVEd:', investments)
+    }, [investments])
     // Helper function to calculate gain/loss
     const calculateGainLoss = (quantity: number, buyPrice: number, currentPrice?: number) => {
         if (!currentPrice) return { gainLoss: 0, gainLossPercent: 0, status: 'Unknown' as const }
@@ -299,68 +311,16 @@ const InvestmentTable = () => {
         }
     ]
 
-    // Sample data matching your Java model
-    useEffect(() => {
-        const sampleData: Investment[] = [
-            {
-                id: '1',
-                assetName: 'Apple Inc. (AAPL)',
-                quantity: 100,
-                buyPrice: 150.00,
-                currentPrice: 175.50,
-                buyDate: '2024-01-15',
-                notes: 'Tech stock investment'
-            },
-            {
-                id: '2',
-                assetName: 'Tesla Inc. (TSLA)',
-                quantity: 50,
-                buyPrice: 250.00,
-                currentPrice: 200.00,
-                buyDate: '2024-02-01',
-                notes: 'EV company stock'
-            },
-            {
-                id: '3',
-                assetName: 'Bitcoin (BTC)',
-                quantity: 0.5,
-                buyPrice: 45000.00,
-                currentPrice: 54000.00,
-                buyDate: '2024-03-10',
-                notes: 'Cryptocurrency investment'
-            },
-            {
-                id: '4',
-                assetName: 'Gold ETF (GLD)',
-                quantity: 25,
-                buyPrice: 180.00,
-                currentPrice: undefined, // No current price available
-                buyDate: '2024-04-05',
-                notes: 'Precious metal hedge'
-            },
-            {
-                id: '5',
-                assetName: 'S&P 500 ETF (SPY)',
-                quantity: 75,
-                buyPrice: 420.00,
-                currentPrice: 445.50,
-                buyDate: '2024-05-20',
-                notes: 'Diversified market exposure'
-            }
-        ]
-        setInvestments(sampleData)
-    }, [])
-
     return (
         <Card className="w-5xl m-5 p-5 mt-10">
             <DataTable
                 data={investments}
                 columns={columns}
-                initialPageSize={10}
+                initialPageSize={tableSetup.pageSize}
                 initialSorting={[
                     {
                         id: 'buyDate',
-                        desc: true // Sort by most recent purchases first
+                        desc: true
                     }
                 ]}
                 emptyMessage="No investments found. Add your first investment to get started."
@@ -368,6 +328,13 @@ const InvestmentTable = () => {
                 showPagination={true}
                 showRowsPerPage={true}
                 className="mt-4"
+                onPageSizeChange={(pageSize) => {
+                    // console.log('Page size changed:', pageSize)
+                    setTableSetup((prev) => ({ ...prev, pageSize }))}}
+                onPageNumberChange={(pageNumber) => {
+                    console.log('Page number changed:', pageNumber)
+                    setTableSetup((prev) => ({ ...prev, pageNumber }))
+                }}
             />
         </Card>
     )
