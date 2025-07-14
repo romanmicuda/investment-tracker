@@ -143,26 +143,6 @@ const InvestmentTable = () => {
         getInvestements()
     }, [tableSetup])
 
-    useEffect(() => {
-        console.log('TINVEd:', investments)
-    }, [investments])
-    // Helper function to calculate gain/loss
-    const calculateGainLoss = (quantity: number, buyPrice: number, currentPrice?: number) => {
-        if (!currentPrice) return { gainLoss: 0, gainLossPercent: 0, status: 'Unknown' as const }
-
-        const totalBuyValue = quantity * buyPrice
-        const totalCurrentValue = quantity * currentPrice
-        const gainLoss = totalCurrentValue - totalBuyValue
-        const gainLossPercent = (gainLoss / totalBuyValue) * 100
-
-        let status: 'Profitable' | 'Loss' | 'Break Even' | 'Unknown'
-        if (gainLoss > 0) status = 'Profitable'
-        else if (gainLoss < 0) status = 'Loss'
-        else status = 'Break Even'
-
-        return { gainLoss, gainLossPercent, status }
-    }
-
     // Define columns for your investment data
     const columns: ColumnDef<Investment>[] = [
         {
@@ -178,7 +158,7 @@ const InvestmentTable = () => {
             header: 'Quantity',
             accessorKey: 'quantity',
             cell: ({ row }) => (
-                <div className="text-right">
+                <div className="max-w-32 truncate" >
                     {(row.getValue('quantity') as number).toLocaleString()}
                 </div>
             )
@@ -187,29 +167,8 @@ const InvestmentTable = () => {
             header: 'Buy Price',
             accessorKey: 'buyPrice',
             cell: ({ row }) => (
-                <div className="text-right">
+                <div className="max-w-32 truncate" >
                     ${(row.getValue('buyPrice') as number).toFixed(2)}
-                </div>
-            )
-        },
-        {
-            header: 'Current Price',
-            accessorKey: 'currentPrice',
-            cell: ({ row }) => {
-                const currentPrice = row.getValue('currentPrice') as number | undefined
-                return (
-                    <div className="text-right">
-                        {currentPrice ? `$${currentPrice.toFixed(2)}` : 'N/A'}
-                    </div>
-                )
-            }
-        },
-        {
-            header: 'Buy Date',
-            accessorKey: 'buyDate',
-            cell: ({ row }) => (
-                <div>
-                    {new Date(row.getValue('buyDate')).toLocaleDateString()}
                 </div>
             )
         },
@@ -223,77 +182,9 @@ const InvestmentTable = () => {
 
                 const value = currentPrice ? quantity * currentPrice : quantity * buyPrice
                 return (
-                    <div className="text-right font-medium">
+                    <div className="max-w-32 truncate">
                         ${value.toFixed(2)}
                     </div>
-                )
-            }
-        },
-        {
-            header: 'Gain/Loss',
-            id: 'gainLoss',
-            cell: ({ row }) => {
-                const quantity = row.getValue('quantity') as number
-                const buyPrice = row.getValue('buyPrice') as number
-                const currentPrice = row.getValue('currentPrice') as number | undefined
-
-                const { gainLoss } = calculateGainLoss(quantity, buyPrice, currentPrice)
-                const isPositive = gainLoss >= 0
-
-                if (!currentPrice) {
-                    return <div className="text-right text-gray-500">N/A</div>
-                }
-
-                return (
-                    <div className={`text-right font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                        {isPositive ? '+' : ''}${gainLoss.toFixed(2)}
-                    </div>
-                )
-            }
-        },
-        {
-            header: 'Gain/Loss %',
-            id: 'gainLossPercent',
-            cell: ({ row }) => {
-                const quantity = row.getValue('quantity') as number
-                const buyPrice = row.getValue('buyPrice') as number
-                const currentPrice = row.getValue('currentPrice') as number | undefined
-
-                const { gainLossPercent } = calculateGainLoss(quantity, buyPrice, currentPrice)
-                const isPositive = gainLossPercent >= 0
-
-                if (!currentPrice) {
-                    return <div className="text-right text-gray-500">N/A</div>
-                }
-
-                return (
-                    <div className={`text-right font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                        {isPositive ? '+' : ''}{gainLossPercent.toFixed(2)}%
-                    </div>
-                )
-            }
-        },
-        {
-            header: 'Status',
-            id: 'status',
-            cell: ({ row }) => {
-                const quantity = row.getValue('quantity') as number
-                const buyPrice = row.getValue('buyPrice') as number
-                const currentPrice = row.getValue('currentPrice') as number | undefined
-
-                const { status } = calculateGainLoss(quantity, buyPrice, currentPrice)
-
-                const statusStyles = {
-                    'Profitable': 'bg-green-100 text-green-800 hover:bg-green-200',
-                    'Loss': 'bg-red-100 text-red-800 hover:bg-red-200',
-                    'Break Even': 'bg-gray-100 text-gray-800 hover:bg-gray-200',
-                    'Unknown': 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                }[status]
-
-                return (
-                    <Badge className={statusStyles}>
-                        {status}
-                    </Badge>
                 )
             }
         },
