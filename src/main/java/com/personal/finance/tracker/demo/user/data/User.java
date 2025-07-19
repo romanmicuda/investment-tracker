@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.personal.finance.tracker.demo.category.data.Category;
-import com.personal.finance.tracker.demo.investment.model.Investment;
+import com.personal.finance.tracker.demo.investment.data.Investment;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 
 import jakarta.persistence.*;

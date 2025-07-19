@@ -1,4 +1,4 @@
-package com.personal.finance.tracker.demo.investment.model;
+package com.personal.finance.tracker.demo.investment.data;
 
 import jakarta.persistence.*;
 import lombok.*;
