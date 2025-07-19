@@ -194,10 +194,7 @@ export function DataTable<TData>({
                     variant='outline'
                     className='disabled:pointer-events-none disabled:opacity-50'
                     onClick={() => {
-                      const nextPage = Math.min(
-                        table.getState().pagination.pageIndex + 1,
-                        Math.ceil(table.getRowCount() / table.getState().pagination.pageSize) - 1
-                      )
+                      const nextPage = table.getState().pagination.pageIndex + 1
                       table.setPageIndex(nextPage)
                       onPageNumberChange(nextPage)
                     }}
