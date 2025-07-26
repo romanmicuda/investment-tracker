@@ -9,10 +9,12 @@ import { Card, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { DataTable } from './Table'
 import { useInvestmentContext } from './InvestmentContext'
+import { useRouter } from 'next/navigation'
 
 
 // Define your investment data type to match Java model
 type Investment = {
+    id: string
     assetName: string
     quantity: number
     buyPrice: number
@@ -34,7 +36,8 @@ const page = () => {
 export default page
 
 const Control = () => {
-    const { setShowAddInvestmentForm } = useInvestmentContext()
+    const { setShowAddInvestmentForm, filterInvestments } = useInvestmentContext()
+    const [searchQuery, setSearchQuery] = useState('')
     return (
         <Card className="w-5xl m-5 mt-10">
             <CardHeader className="flex justify-between">
@@ -43,8 +46,10 @@ const Control = () => {
                         type="text"
                         placeholder="Search investments..."
                         className="w-2xl"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <Button type="submit">
+                    <Button type="button" onClick={() => filterInvestments(searchQuery)}>
                         Search
                     </Button>
                 </form>
@@ -137,8 +142,8 @@ const InvestementForm = () => {
 }
 
 const InvestmentTable = () => {
-    const { getInvestements, investments, tableSetup, setTableSetup  } = useInvestmentContext()
-
+    const { getInvestements, filteredInvestments, tableSetup, setTableSetup  } = useInvestmentContext()
+    const router = useRouter()
     useEffect(() => {
         getInvestements()
     }, [tableSetup])
@@ -205,7 +210,7 @@ const InvestmentTable = () => {
     return (
         <Card className="w-5xl m-5 p-5 mt-10">
             <DataTable
-                data={investments}
+                data={filteredInvestments}
                 columns={columns}
                 initialPageSize={tableSetup.pageSize}
                 initialSorting={[
@@ -226,6 +231,7 @@ const InvestmentTable = () => {
                     console.log('Page number changed:', pageNumber)
                     setTableSetup((prev) => ({ ...prev, pageNumber }))
                 }}
+                onClick={(id) => router.push(`investment/${id}`)}
             />
         </Card>
     )

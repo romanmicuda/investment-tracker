@@ -49,7 +49,7 @@ public class InvestmentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInvestmentById(@PathVariable("id") UUID id) throws NotFoundException {
         investmentService.deleteInvestmentById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
