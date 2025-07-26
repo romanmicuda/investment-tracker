@@ -42,12 +42,12 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable UUID id) throws NotFoundException {
+    public ResponseEntity<Transaction> getTransactionById(@PathVariable("id") UUID id) throws NotFoundException {
         return ResponseEntity.ok(transactionService.getTransactionById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable UUID id, @RequestBody UpdateTransactionRequest transaction) throws NotFoundException {
+    public ResponseEntity<Transaction> updateTransaction(@PathVariable("id")UUID id, @RequestBody UpdateTransactionRequest transaction) throws NotFoundException {
         return ResponseEntity.ok(transactionService.updateTransaction(id, transaction));
     }
 
@@ -60,7 +60,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTransaction(@PathVariable UUID id) throws NotFoundException {
+    public void deleteTransaction(@PathVariable("id") UUID id) throws NotFoundException {
         transactionService.deleteTransaction(id);
     }
     
