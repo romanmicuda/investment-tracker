@@ -2,7 +2,7 @@
 
 import { api, secureApi } from '@/components/utils/routes';
 import { useRouter } from 'next/navigation';
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, use, useEffect } from 'react';
 
 type Investment = {
     id?: string // Add optional id field
@@ -28,6 +28,8 @@ interface InvestmentContextType {
     fetchSelectedInvestment: (id: string) => void;
     deleteInvestment: (id: string) => void;
     editInvestment: (id: string, investment: Investment) => void;
+    filterInvestments: (query: string) => void;
+    filteredInvestments: Investment[];
 }
 
 const InvestmentContext = createContext<InvestmentContextType | undefined>(undefined);
@@ -47,10 +49,17 @@ export type TableSetupType = {
 
 export const InvestmentProvider = ({ children }: { children: ReactNode }) => {
     const [investments, setInvestments] = useState<Investment[]>([]);
+    const [filteredInvestments, setFilteredInvestments] = useState<Investment[]>([]);
     const [showAddInvestmentForm, setShowAddInvestmentForm] = useState(false);
     const [tableSetup, setTableSetup] = useState<TableSetupType>({pageNumber: 0, pageSize: 5})
     const [selectedInvestment, setSelectedInvestment] = useState<Investment | undefined>(undefined);
     const router = useRouter();
+
+    useEffect(() => {
+        if (investments.length > 0) {
+        setFilteredInvestments(investments);
+        }
+    }, [investments]);
 
     const addInvestment = async (investment: Investment) => {
         try {
@@ -136,12 +145,29 @@ export const InvestmentProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const filterInvestments = (query: string) => {
+        if (!query) {
+            setFilteredInvestments(investments);
+            return;
+        }
+        const lowerQuery = query.toLowerCase();
+        const filtered = investments.filter(inv =>
+            inv.assetName.toLowerCase().includes(lowerQuery) ||
+            inv.notes?.toLowerCase().includes(lowerQuery) ||
+            inv.buyDate.toLowerCase().includes(lowerQuery) ||
+            inv.quantity.toString().includes(lowerQuery) ||
+            inv.buyPrice.toString().includes(lowerQuery) ||
+            (inv.currentPrice ? inv.currentPrice.toString().includes(lowerQuery) : false)
+        );
+        setFilteredInvestments(filtered);
+    };
 
     return (
         <InvestmentContext.Provider
             value={{ investments, addInvestment, removeInvestment, tableSetup, setTableSetup,
                  updateInvestment, getInvestements, showAddInvestmentForm, setShowAddInvestmentForm,
-                 selectedInvestment, fetchSelectedInvestment, deleteInvestment, editInvestment }}
+                 selectedInvestment, fetchSelectedInvestment, deleteInvestment, editInvestment,
+                 filteredInvestments, filterInvestments }}
         >
             {children}
         </InvestmentContext.Provider>

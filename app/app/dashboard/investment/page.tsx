@@ -36,7 +36,8 @@ const page = () => {
 export default page
 
 const Control = () => {
-    const { setShowAddInvestmentForm } = useInvestmentContext()
+    const { setShowAddInvestmentForm, filterInvestments } = useInvestmentContext()
+    const [searchQuery, setSearchQuery] = useState('')
     return (
         <Card className="w-5xl m-5 mt-10">
             <CardHeader className="flex justify-between">
@@ -45,8 +46,10 @@ const Control = () => {
                         type="text"
                         placeholder="Search investments..."
                         className="w-2xl"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <Button type="submit">
+                    <Button type="button" onClick={() => filterInvestments(searchQuery)}>
                         Search
                     </Button>
                 </form>
@@ -139,7 +142,7 @@ const InvestementForm = () => {
 }
 
 const InvestmentTable = () => {
-    const { getInvestements, investments, tableSetup, setTableSetup  } = useInvestmentContext()
+    const { getInvestements, filteredInvestments, tableSetup, setTableSetup  } = useInvestmentContext()
     const router = useRouter()
     useEffect(() => {
         getInvestements()
@@ -207,7 +210,7 @@ const InvestmentTable = () => {
     return (
         <Card className="w-5xl m-5 p-5 mt-10">
             <DataTable
-                data={investments}
+                data={filteredInvestments}
                 columns={columns}
                 initialPageSize={tableSetup.pageSize}
                 initialSorting={[
