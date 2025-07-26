@@ -9,10 +9,12 @@ import { Card, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { DataTable } from './Table'
 import { useInvestmentContext } from './InvestmentContext'
+import { useRouter } from 'next/navigation'
 
 
 // Define your investment data type to match Java model
 type Investment = {
+    id: string
     assetName: string
     quantity: number
     buyPrice: number
@@ -138,7 +140,7 @@ const InvestementForm = () => {
 
 const InvestmentTable = () => {
     const { getInvestements, investments, tableSetup, setTableSetup  } = useInvestmentContext()
-
+    const router = useRouter()
     useEffect(() => {
         getInvestements()
     }, [tableSetup])
@@ -226,6 +228,7 @@ const InvestmentTable = () => {
                     console.log('Page number changed:', pageNumber)
                     setTableSetup((prev) => ({ ...prev, pageNumber }))
                 }}
+                onClick={(id) => router.push(`investment/${id}`)}
             />
         </Card>
     )

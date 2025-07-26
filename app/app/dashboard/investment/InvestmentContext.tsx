@@ -1,6 +1,7 @@
 'use client'
 
 import { api, secureApi } from '@/components/utils/routes';
+import { useRouter } from 'next/navigation';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type Investment = {
@@ -23,6 +24,10 @@ interface InvestmentContextType {
     setShowAddInvestmentForm: (show: boolean) => void;
     tableSetup: TableSetupType;
     setTableSetup: (setup: TableSetupType) => void;
+    selectedInvestment: Investment | undefined;
+    fetchSelectedInvestment: (id: string) => void;
+    deleteInvestment: (id: string) => void;
+    editInvestment: (id: string, investment: Investment) => void;
 }
 
 const InvestmentContext = createContext<InvestmentContextType | undefined>(undefined);
@@ -44,6 +49,8 @@ export const InvestmentProvider = ({ children }: { children: ReactNode }) => {
     const [investments, setInvestments] = useState<Investment[]>([]);
     const [showAddInvestmentForm, setShowAddInvestmentForm] = useState(false);
     const [tableSetup, setTableSetup] = useState<TableSetupType>({pageNumber: 0, pageSize: 5})
+    const [selectedInvestment, setSelectedInvestment] = useState<Investment | undefined>(undefined);
+    const router = useRouter();
 
     const addInvestment = async (investment: Investment) => {
         try {
@@ -85,11 +92,56 @@ export const InvestmentProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const fetchSelectedInvestment = async (id: string) => {
+        try {
+            const response = await api.get(`api/investments/${id}`);
+            if (response.status === 200) {
+                setSelectedInvestment(response.data as Investment);
+            } else {
+                alert('Failed to fetch investment details');
+            }
+        } catch (error) {
+            console.error('Error fetching selected investment:', error);
+            alert('An error occurred while fetching investment details.');
+        }
+    };
+
+    const deleteInvestment = async (id: string) => {
+        try {
+            const response = await api.delete(`api/investments/${id}`);
+            if (response.status === 200) {
+                setInvestments(prev => prev.filter(inv => inv.id !== id));
+                alert('Investment deleted successfully');
+                router.push('/dashboard/investment');
+            } else {
+                alert('Failed to delete investment');
+            }
+        } catch (error) {
+            alert('An error occurred while deleting the investment.');
+        }
+    };
+
+    const editInvestment = async (id: string, investment: Investment) => {
+        try {
+            const response = await api.put(`api/investments/${id}`, investment);
+            if (response.status === 200) {
+                setInvestments(prev => prev.map(inv => (inv.id === id ? investment : inv)));
+                alert('Investment updated successfully');
+            } else {
+                alert('Failed to update investment');
+            }
+        } catch (error) {
+            console.error('Error updating investment:', error);
+            alert('An error occurred while updating the investment.');
+        }
+    };
+
 
     return (
         <InvestmentContext.Provider
             value={{ investments, addInvestment, removeInvestment, tableSetup, setTableSetup,
-                 updateInvestment, getInvestements, showAddInvestmentForm, setShowAddInvestmentForm }}
+                 updateInvestment, getInvestements, showAddInvestmentForm, setShowAddInvestmentForm,
+                 selectedInvestment, fetchSelectedInvestment, deleteInvestment, editInvestment }}
         >
             {children}
         </InvestmentContext.Provider>

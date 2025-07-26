@@ -40,6 +40,7 @@ interface DataTableProps<TData> {
   className?: string
   onPageSizeChange: (pageSize: number) => void
   onPageNumberChange?: (pageNumber: number) => void
+  onClick?: (id: string) => void
 }
 
 export function DataTable<TData>({
@@ -53,7 +54,8 @@ export function DataTable<TData>({
   emptyMessage = 'No results.',
   className,
   onPageSizeChange,
-  onPageNumberChange
+  onPageNumberChange,
+  onClick
 }: DataTableProps<TData>) {
   const id = useId()
 
@@ -124,7 +126,7 @@ export function DataTable<TData>({
               table.getRowModel().rows.map(row => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    <TableCell key={cell.id} onClick={() => onClick(row.original.id)}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
                 </TableRow>
               ))
