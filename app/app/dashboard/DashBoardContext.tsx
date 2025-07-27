@@ -9,7 +9,15 @@ interface DashboardContextType {
         income: number;
         expenses: number;
     };
+    investmentsStatistics: {
+        totalInvestedValue: number;
+        totalNumberOfInvestments: number;
+        earliestInvestmentDate: string | null;
+        latestInvestmentDate: string | null;
+        investmentValueByAsset: Record<string, number>;
+    };
     fetchTransactionsStatistics: () => Promise<void>;
+    fetchInvestmentsStatistics: () => Promise<void>;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -23,6 +31,13 @@ export const DashboardProvider = ({ children }: DashboardProviderProps) => {
         totalBalance: 0,
         income: 0,
         expenses: 0,
+    });
+    const [investmentsStatistics, setInvestmentsStatistics] = useState({
+        totalInvestedValue: 0,
+        totalNumberOfInvestments: 0,
+        earliestInvestmentDate: null as string | null,
+        latestInvestmentDate: null as string | null,
+        investmentValueByAsset: {} as Record<string, number>,
     });
 
     const fetchTransactionsStatistics = async () => {
@@ -38,10 +53,24 @@ export const DashboardProvider = ({ children }: DashboardProviderProps) => {
         }
     };
 
+    const fetchInvestmentsStatistics = async () => {
+        try {
+            const response = await secureApi.get('/investments/statistics');
+            if (response.status === 200) {
+                setInvestmentsStatistics(response.data);
+            } else {
+                alert('Failed to fetch investments statistics');
+            }
+        } catch (error) {
+            alert('Error fetching investments statistics');
+        }
+    };
+
 
 
     return (
-        <DashboardContext.Provider value={{ transactionsStatistics, fetchTransactionsStatistics }}>
+        <DashboardContext.Provider value={{ transactionsStatistics, fetchTransactionsStatistics,
+                                             investmentsStatistics, fetchInvestmentsStatistics }}>
             {children}
         </DashboardContext.Provider>
     );

@@ -1,8 +1,10 @@
 package com.personal.finance.tracker.demo.investment.logic;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,9 +13,11 @@ import org.springframework.stereotype.Service;
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.investment.data.Investment;
 import com.personal.finance.tracker.demo.investment.data.InvestmentRepository;
+import com.personal.finance.tracker.demo.investment.data.InvestmentStatistics;
 import com.personal.finance.tracker.demo.investment.web.AllInvestementReqeust;
 import com.personal.finance.tracker.demo.investment.web.bodies.InvestmentRequest;
 import com.personal.finance.tracker.demo.investment.web.bodies.UpdateInvestmentRequest;
+import com.personal.finance.tracker.demo.user.data.User;
 
 @Service
 public class InvestmentServiceImpl implements InvestmentService {
@@ -42,13 +46,14 @@ public class InvestmentServiceImpl implements InvestmentService {
         }
     }
     @Override
-    public Investment createInvestment(InvestmentRequest request){
+    public Investment createInvestment(InvestmentRequest request, User user){
         Investment newInvestment = new Investment();
         newInvestment.setAssetName(request.getAssetName());
         newInvestment.setQuantity(request.getQuantity());
         newInvestment.setBuyPrice(request.getBuyPrice());
         newInvestment.setBuyDate(request.getBuyDate());
         newInvestment.setNotes(request.getNotes());
+        newInvestment.setUser(user);
         return investementRepository.save(newInvestment);
     }
     @Override
@@ -71,5 +76,38 @@ public class InvestmentServiceImpl implements InvestmentService {
     public Page<Investment> getAllInvestments(AllInvestementReqeust request) {
        return investementRepository.findAll(PageRequest.of(request.getPageNumber(), request.getPageSize()));
     }
-    
+    @Override
+    public InvestmentStatistics getInvestmentStatistics(User user) {
+        List<Investment> investments = investementRepository.findAllByUser(user);
+        InvestmentStatistics statistics = new InvestmentStatistics();
+        statistics.setInvestmentValueByAsset(
+            investments.stream()
+                .collect(Collectors.groupingBy(Investment::getAssetName, 
+                    Collectors.summingDouble(investment -> 
+                       investment.getQuantity() * investment.getBuyPrice()
+                    ))
+                )
+        );
+        statistics.setEarliestInvestmentDate(
+            investments.stream()
+                .map(Investment::getBuyDate)
+                .min(LocalDate::compareTo)
+                .orElse(null)
+        );
+        statistics.setLatestInvestmentDate(
+            investments.stream()
+                .map(Investment::getBuyDate)
+                .max(LocalDate::compareTo)
+                .orElse(null)
+        );
+        statistics.setTotalInvestedValue(
+            investments.stream()
+                .mapToDouble(investment -> investment.getQuantity() * investment.getBuyPrice())
+                .sum()
+        );
+        statistics.setTotalNumberOfInvestments(investments.size());
+        return statistics;
+
+    }
+
 }
