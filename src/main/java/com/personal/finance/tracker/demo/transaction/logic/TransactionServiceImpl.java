@@ -12,6 +12,7 @@ import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
 import com.personal.finance.tracker.demo.transaction.data.TransactionRepository;
 import com.personal.finance.tracker.demo.transaction.data.TransactionType;
+import com.personal.finance.tracker.demo.transaction.data.TransactionsStatistics;
 import com.personal.finance.tracker.demo.transaction.web.UpdateTransactionRequest;
 import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionCreateRequest;
 import com.personal.finance.tracker.demo.user.data.User;
@@ -79,5 +80,25 @@ public class TransactionServiceImpl implements TransactionService {
         return transactions;
     }
 
-
+    @Override
+    public TransactionsStatistics getTransactionsStatistics(User appUser) throws NotFoundException {
+        List<Transaction> transactions = transactionRepository.findAllByUser(appUser);
+        if (transactions.isEmpty()) {
+            return new TransactionsStatistics();
+        }
+        TransactionsStatistics statistics = new TransactionsStatistics();
+        statistics.setTotalBalance(transactions.stream()
+                .mapToDouble(Transaction::getAmount)
+                .sum());
+        statistics.setIncome(transactions.stream()
+                .filter(t -> t.getType() == TransactionType.INCOME)
+                .mapToDouble(Transaction::getAmount)
+                .sum());
+        statistics.setExpenses(transactions.stream()
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
+                .mapToDouble(Transaction::getAmount)
+                .sum());
+        return statistics;
+    }
 }
+

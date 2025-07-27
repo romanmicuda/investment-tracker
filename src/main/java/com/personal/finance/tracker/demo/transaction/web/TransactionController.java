@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.transaction.data.Transaction;
+import com.personal.finance.tracker.demo.transaction.data.TransactionsStatistics;
 import com.personal.finance.tracker.demo.transaction.logic.TransactionService;
 import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionCreateRequest;
+import com.personal.finance.tracker.demo.transaction.web.bodies.TransactionsStatisticsResponse;
 import com.personal.finance.tracker.demo.user.data.User;
 import com.personal.finance.tracker.demo.user.logic.UserProviderService;
 
@@ -42,12 +44,12 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable UUID id) throws NotFoundException {
+    public ResponseEntity<Transaction> getTransactionById(@PathVariable("id") UUID id) throws NotFoundException {
         return ResponseEntity.ok(transactionService.getTransactionById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable UUID id, @RequestBody UpdateTransactionRequest transaction) throws NotFoundException {
+    public ResponseEntity<Transaction> updateTransaction(@PathVariable("id")UUID id, @RequestBody UpdateTransactionRequest transaction) throws NotFoundException {
         return ResponseEntity.ok(transactionService.updateTransaction(id, transaction));
     }
 
@@ -60,8 +62,16 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTransaction(@PathVariable UUID id) throws NotFoundException {
+    public void deleteTransaction(@PathVariable("id") UUID id) throws NotFoundException {
         transactionService.deleteTransaction(id);
     }
-    
+
+    @GetMapping("/statistics")
+    public ResponseEntity<TransactionsStatisticsResponse> getTransactionsStatistics() throws NotFoundException {
+        User appUser = userProviderService.getCurrentUser()
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        TransactionsStatistics statistics = transactionService.getTransactionsStatistics(appUser);
+        return ResponseEntity.ok(TransactionsStatisticsResponse.fromStatistics(statistics));
+    }
+
 }

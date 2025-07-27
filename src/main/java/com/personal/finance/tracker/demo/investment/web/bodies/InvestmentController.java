@@ -1,4 +1,4 @@
-package com.personal.finance.tracker.demo.investment.web;
+package com.personal.finance.tracker.demo.investment.web.bodies;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,19 +16,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.personal.finance.tracker.demo.exception.NotFoundException;
 import com.personal.finance.tracker.demo.investment.data.Investment;
+import com.personal.finance.tracker.demo.investment.data.InvestmentStatistics;
 import com.personal.finance.tracker.demo.investment.logic.InvestmentService;
-import com.personal.finance.tracker.demo.investment.web.bodies.InvestmentRequest;
-import com.personal.finance.tracker.demo.investment.web.bodies.InvestmentResponse;
-import com.personal.finance.tracker.demo.investment.web.bodies.UpdateInvestmentRequest;
+import com.personal.finance.tracker.demo.investment.web.AllInvestementReqeust;
+import com.personal.finance.tracker.demo.investment.web.InvestmentStatisticsResponse;
+import com.personal.finance.tracker.demo.user.data.User;
+import com.personal.finance.tracker.demo.user.logic.UserProviderService;
 
 @RequestMapping("api/investments")
 @RestController
 public class InvestmentController {
 
     private final InvestmentService investmentService;
+    private final UserProviderService userProviderService;
 
-    public InvestmentController(InvestmentService investmentService) {
+    public InvestmentController(InvestmentService investmentService, UserProviderService userProviderService) {
         this.investmentService = investmentService;
+        this.userProviderService = userProviderService;
     }
 
     @GetMapping("/{id}")
@@ -60,8 +64,19 @@ public class InvestmentController {
     }
 
     @PostMapping
-    public ResponseEntity<InvestmentResponse> createInvestment(@RequestBody InvestmentRequest request) {
-        Investment newInvestment = investmentService.createInvestment(request);
+    public ResponseEntity<InvestmentResponse> createInvestment(@RequestBody InvestmentRequest request) throws NotFoundException {
+        User appUser = userProviderService.getCurrentUser()
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        Investment newInvestment = investmentService.createInvestment(request, appUser);
         return ResponseEntity.ok(new InvestmentResponse(newInvestment));
     }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<InvestmentStatisticsResponse> getInvestmentStatistics() throws NotFoundException {
+        User appUser = userProviderService.getCurrentUser()
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        InvestmentStatistics statistics = investmentService.getInvestmentStatistics(appUser);
+        return ResponseEntity.ok(InvestmentStatisticsResponse.fromStatistics(statistics));
+    }   
+
 }
